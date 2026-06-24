@@ -259,6 +259,12 @@
         background: rgba(248, 243, 234, 0.08);
       }
 
+      .queue-time {
+        color: var(--muted);
+        font-size: 12px;
+        text-align: right;
+      }
+
       .empty {
         padding: 22px;
         border: 1px dashed rgba(248, 243, 234, 0.24);
@@ -454,15 +460,16 @@
           <ol class="queue" data-queue-list></ol>
 
           <div class="actions">
-            <button class="icon-button" type="button" data-clear-queue>Clear</button>
+            <button class="icon-button" type="button" data-clear-queue data-local-only>Clear</button>
           </div>
         </section>
 
         <aside class="panel" aria-label="Add yourself">
-          <div>
-            <h2>Join</h2>
-            <p>Search the local catalog. Requests store the Spotify track ID.</p>
-          </div>
+            <div>
+              <h2>Join</h2>
+              <p>Search the local catalog. Requests store the Spotify track ID.</p>
+              <p class="status" data-backend-status>Connecting...</p>
+            </div>
 
           <form data-request-form>
             <label>
@@ -501,6 +508,8 @@
       </div>
     </main>
 
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
   </body>
 </html>
