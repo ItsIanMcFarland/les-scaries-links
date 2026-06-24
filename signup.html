@@ -3,20 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sing a Song | Les Scaries</title>
-    <meta
-      name="description"
-      content="Request a song and sign up to sing with Les Scaries."
-    />
+    <title>Join the Queue | Scaries</title>
+    <meta name="description" content="Add yourself to the Scaries live-band karaoke queue." />
     <style>
       :root {
         color-scheme: dark;
         --ink: #f8f3ea;
         --muted: #cdbfb4;
         --line: rgba(248, 243, 234, 0.18);
-        --panel: rgba(20, 18, 20, 0.74);
-        --field: rgba(248, 243, 234, 0.08);
-        --red: #d92832;
+        --panel: rgba(20, 18, 20, 0.78);
+        --field: rgba(248, 243, 234, 0.09);
         --gold: #f5bf4d;
         --green: #4ebf8d;
         --black: #0f0d10;
@@ -34,102 +30,64 @@
           "Segoe UI", sans-serif;
         color: var(--ink);
         background:
-          linear-gradient(180deg, rgba(15, 13, 16, 0.56), rgba(15, 13, 16, 0.9)),
+          linear-gradient(180deg, rgba(15, 13, 16, 0.54), rgba(15, 13, 16, 0.9)),
           url("assets/les-scaries-stage.png") center / cover fixed,
           #0f0d10;
       }
 
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        opacity: 0.4;
-        background-image:
-          radial-gradient(circle at 50% 22%, rgba(245, 191, 77, 0.18), transparent 18rem),
-          linear-gradient(90deg, rgba(217, 40, 50, 0.26), transparent 24%, transparent 78%, rgba(78, 191, 141, 0.14)),
-          linear-gradient(to bottom, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.74));
-      }
-
       main {
-        position: relative;
-        z-index: 1;
-        width: min(100%, 720px);
+        width: min(100%, 560px);
+        min-height: 100vh;
         margin: 0 auto;
-        padding: clamp(24px, 5vw, 52px) 18px 34px;
+        padding: clamp(22px, 5vw, 46px) 16px 34px;
+        display: grid;
+        align-content: center;
+        gap: 16px;
       }
 
-      .back {
-        display: inline-flex;
-        align-items: center;
-        min-height: 40px;
-        margin-bottom: 22px;
+      a {
         color: var(--muted);
         text-decoration: none;
-        font-size: 14px;
-      }
-
-      .back:hover,
-      .back:focus-visible {
-        color: var(--ink);
-        outline: none;
-      }
-
-      header {
-        display: grid;
-        gap: 10px;
-        margin-bottom: 22px;
       }
 
       h1 {
         margin: 0;
         font-family: Georgia, "Times New Roman", serif;
-        font-size: clamp(44px, 10vw, 76px);
+        font-size: clamp(42px, 11vw, 74px);
         line-height: 0.9;
         letter-spacing: 0;
       }
 
-      .tagline {
+      p {
         margin: 0;
-        max-width: 35rem;
         color: var(--muted);
-        font-size: 16px;
-        line-height: 1.55;
+        line-height: 1.5;
       }
 
-      form,
-      .result {
+      .panel {
         display: grid;
-        gap: 16px;
-        padding: clamp(18px, 4vw, 28px);
+        gap: 14px;
+        padding: clamp(16px, 4vw, 24px);
         border: 1px solid var(--line);
         border-radius: 8px;
         background: var(--panel);
         backdrop-filter: blur(18px);
-        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.26);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
       }
 
-      .grid {
+      form {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        gap: 12px;
       }
 
       label {
         display: grid;
         gap: 7px;
-        color: var(--ink);
         font-size: 14px;
-        font-weight: 700;
+        font-weight: 800;
       }
 
-      .full {
-        grid-column: 1 / -1;
-      }
-
-      input,
-      select,
-      textarea {
+      input {
         width: 100%;
         min-height: 48px;
         border: 1px solid rgba(248, 243, 234, 0.2);
@@ -140,238 +98,102 @@
         font: inherit;
       }
 
-      textarea {
-        min-height: 116px;
-        resize: vertical;
-      }
-
-      input:focus,
-      select:focus,
-      textarea:focus {
+      input:focus {
         border-color: rgba(245, 191, 77, 0.72);
         outline: 3px solid rgba(245, 191, 77, 0.16);
       }
 
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-      }
-
-      button,
-      .button {
+      button {
         min-height: 48px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
         border: 1px solid rgba(248, 243, 234, 0.18);
         border-radius: 8px;
-        padding: 0 16px;
         color: #130f10;
         background: var(--gold);
         font: inherit;
-        font-weight: 800;
-        text-decoration: none;
+        font-weight: 900;
         cursor: pointer;
       }
 
-      .secondary {
-        color: var(--ink);
-        background: rgba(248, 243, 234, 0.08);
-      }
-
-      .note {
-        margin: 0;
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.45;
-      }
-
-      .result {
-        display: none;
-        margin-top: 16px;
-      }
-
-      .result.visible {
+      .search-results {
         display: grid;
+        gap: 6px;
+        margin-top: 7px;
       }
 
-      .request {
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        margin: 0;
-        padding: 14px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
+      .song-result {
+        min-height: 58px;
+        display: grid;
+        grid-template-columns: 42px 1fr;
+        gap: 10px;
+        align-items: center;
+        padding: 8px;
         color: var(--ink);
-        background: rgba(0, 0, 0, 0.22);
-        font-size: 14px;
-        line-height: 1.48;
+        background: rgba(0, 0, 0, 0.38);
+        text-align: left;
       }
 
-      @media (max-width: 620px) {
-        body {
-          background:
-            linear-gradient(180deg, rgba(15, 13, 16, 0.48), rgba(15, 13, 16, 0.9)),
-            url("assets/les-scaries-stage.png") 50% 0 / auto 100vh no-repeat fixed,
-            #0f0d10;
-        }
+      .song-result img {
+        width: 42px;
+        aspect-ratio: 1;
+        border-radius: 6px;
+        object-fit: cover;
+      }
 
-        .grid {
-          grid-template-columns: 1fr;
-        }
+      .song-result span,
+      .selected-song {
+        display: grid;
+        gap: 2px;
+      }
 
-        .actions {
-          display: grid;
-        }
+      small {
+        color: var(--muted);
+        font-size: 12px;
+      }
 
-        button,
-        .button {
-          width: 100%;
-        }
+      .selected-song {
+        padding: 10px;
+        border: 1px solid rgba(78, 191, 141, 0.5);
+        border-radius: 8px;
+        background: rgba(78, 191, 141, 0.1);
+      }
+
+      .status {
+        min-height: 20px;
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 800;
       }
     </style>
   </head>
-  <body>
+  <body data-page="request">
     <main>
-      <a class="back" href="index.html">&larr; Les Scaries</a>
+      <a href="index.html">&larr; Queue</a>
 
-      <header>
-        <h1>Sing a Song</h1>
-        <p class="tagline">
-          Send us your song request and performance details. Pick from the catalog or pitch us one
-          we should learn.
-        </p>
-      </header>
+      <section class="panel">
+        <div>
+          <h1>Join</h1>
+          <p>Just your name and song. The song stores a Spotify track ID.</p>
+        </div>
 
-      <form id="signup-form">
-        <div class="grid">
+        <form data-request-form>
           <label>
-            Your name
-            <input autocomplete="name" name="name" required />
+            Name
+            <input data-singer-name autocomplete="name" required />
           </label>
 
           <label>
-            Email
-            <input autocomplete="email" name="email" type="email" required />
-          </label>
-
-          <label>
-            Phone
-            <input autocomplete="tel" name="phone" type="tel" />
-          </label>
-
-          <label>
-            Event
-            <input name="event" placeholder="Date or event name" />
-          </label>
-
-          <label class="full">
             Song
-            <input name="song" required placeholder="Artist - Song title" />
+            <input data-song-search autocomplete="off" placeholder="Search by song or artist" required />
+            <span class="selected-song" data-selected-song hidden></span>
+            <div class="search-results" data-search-results hidden></div>
           </label>
 
-          <label>
-            Vocal range
-            <select name="range">
-              <option value="">Not sure</option>
-              <option>Soprano / high voice</option>
-              <option>Alto / mid-high voice</option>
-              <option>Tenor / mid voice</option>
-              <option>Baritone / low-mid voice</option>
-              <option>Bass / low voice</option>
-            </select>
-          </label>
-
-          <label>
-            Performance vibe
-            <select name="vibe">
-              <option value="">Choose one</option>
-              <option>I know this cold</option>
-              <option>I might need moral support</option>
-              <option>Group singalong</option>
-              <option>Surprise me</option>
-            </select>
-          </label>
-
-          <label class="full">
-            Notes
-            <textarea
-              name="notes"
-              placeholder="Key changes, duet partners, accessibility needs, alternate song choices..."
-            ></textarea>
-          </label>
-        </div>
-
-        <div class="actions">
-          <button type="submit">Create Request</button>
-          <a
-            class="button secondary"
-            href="https://open.spotify.com/playlist/4KyUr7vipHnMKR1Wc5ZtrO?si=b78c5e3c3eaf45b2"
-          >
-            Browse Songs
-          </a>
-        </div>
-
-        <p class="note">
-          This page is static, so it formats your request for email or copying instead of saving it
-          to a database.
-        </p>
-      </form>
-
-      <section class="result" id="result" aria-live="polite">
-        <p class="note">Request ready.</p>
-        <pre class="request" id="request-text"></pre>
-        <div class="actions">
-          <a class="button" id="email-link" href="#">Open Email App</a>
-          <button class="secondary" id="copy-button" type="button">Copy Request</button>
-        </div>
+          <button type="submit">Add to Queue</button>
+          <p class="status" data-form-status aria-live="polite"></p>
+        </form>
       </section>
     </main>
 
-    <script>
-      const form = document.querySelector("#signup-form");
-      const result = document.querySelector("#result");
-      const requestText = document.querySelector("#request-text");
-      const emailLink = document.querySelector("#email-link");
-      const copyButton = document.querySelector("#copy-button");
-
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const data = new FormData(form);
-        const request = [
-          "Les Scaries song request",
-          "",
-          `Name: ${data.get("name")}`,
-          `Email: ${data.get("email")}`,
-          `Phone: ${data.get("phone") || "Not provided"}`,
-          `Event: ${data.get("event") || "Not provided"}`,
-          `Song: ${data.get("song")}`,
-          `Vocal range: ${data.get("range") || "Not sure"}`,
-          `Performance vibe: ${data.get("vibe") || "Not provided"}`,
-          "",
-          "Notes:",
-          data.get("notes") || "None",
-        ].join("\n");
-
-        requestText.textContent = request;
-        emailLink.href = `mailto:?subject=${encodeURIComponent(
-          "Les Scaries song request",
-        )}&body=${encodeURIComponent(request)}`;
-        result.classList.add("visible");
-        result.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-
-      copyButton.addEventListener("click", async () => {
-        await navigator.clipboard.writeText(requestText.textContent);
-        copyButton.textContent = "Copied";
-        window.setTimeout(() => {
-          copyButton.textContent = "Copy Request";
-        }, 1800);
-      });
-    </script>
+    <script src="app.js"></script>
   </body>
 </html>

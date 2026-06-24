@@ -1,0 +1,309 @@
+{
+  "sourcePlaylistId": "4KyUr7vipHnMKR1Wc5ZtrO",
+  "sourceName": "Sunday Scaries",
+  "importedAt": "2026-06-24",
+  "totalAvailable": 79,
+  "importedCount": 30,
+  "songs": [
+    {
+      "id": "003vvx7Niy0yvhvHt4a68B",
+      "uri": "spotify:track:003vvx7Niy0yvhvHt4a68B",
+      "title": "Mr. Brightside",
+      "artist": "The Killers",
+      "album": "Hot Fuss",
+      "spotifyUrl": "https://open.spotify.com/track/003vvx7Niy0yvhvHt4a68B",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02ccdddd46119a4ff53eaf1f5d",
+      "sort": 1
+    },
+    {
+      "id": "25FTMokYEbEWHEdss5JLZS",
+      "uri": "spotify:track:25FTMokYEbEWHEdss5JLZS",
+      "title": "Teenage Dirtbag",
+      "artist": "Wheatus",
+      "album": "Wheatus",
+      "spotifyUrl": "https://open.spotify.com/track/25FTMokYEbEWHEdss5JLZS",
+      "cover": "https://i.scdn.co/image/ab67616d00001e020a3740efa638f10f14fabc46",
+      "sort": 2
+    },
+    {
+      "id": "2iUmqdfGZcHIhS3b9E9EWq",
+      "uri": "spotify:track:2iUmqdfGZcHIhS3b9E9EWq",
+      "title": "Everybody Talks",
+      "artist": "Neon Trees",
+      "album": "Picture Show",
+      "spotifyUrl": "https://open.spotify.com/track/2iUmqdfGZcHIhS3b9E9EWq",
+      "cover": "https://i.scdn.co/image/ab67616d00001e024a6c0376235e5aa44e59d2c2",
+      "sort": 3
+    },
+    {
+      "id": "3fH4KjXFYMmljxrcGrbPj9",
+      "uri": "spotify:track:3fH4KjXFYMmljxrcGrbPj9",
+      "title": "Don't You (Forget About Me)",
+      "artist": "Simple Minds",
+      "album": "Once Upon A Time (Super Deluxe)",
+      "spotifyUrl": "https://open.spotify.com/track/3fH4KjXFYMmljxrcGrbPj9",
+      "cover": "https://i.scdn.co/image/ab67616d00001e025695a657aef0e81bde0c6001",
+      "sort": 4
+    },
+    {
+      "id": "1k2pQc5i348DCHwbn5KTdc",
+      "uri": "spotify:track:1k2pQc5i348DCHwbn5KTdc",
+      "title": "Pink Pony Club",
+      "artist": "Chappell Roan",
+      "album": "The Rise and Fall of a Midwest Princess",
+      "spotifyUrl": "https://open.spotify.com/track/1k2pQc5i348DCHwbn5KTdc",
+      "cover": "https://i.scdn.co/image/ab67616d00001e0296fa88fb1789be437d5cb4b6",
+      "sort": 5
+    },
+    {
+      "id": "27L8sESb3KR79asDUBu8nW",
+      "uri": "spotify:track:27L8sESb3KR79asDUBu8nW",
+      "title": "Stacy's Mom",
+      "artist": "Fountains Of Wayne",
+      "album": "Welcome Interstate Managers",
+      "spotifyUrl": "https://open.spotify.com/track/27L8sESb3KR79asDUBu8nW",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02079e826265dffc3a8a26bac5",
+      "sort": 6
+    },
+    {
+      "id": "4xdBrk0nFZaP54vvZj0yx7",
+      "uri": "spotify:track:4xdBrk0nFZaP54vvZj0yx7",
+      "title": "HOT TO GO!",
+      "artist": "Chappell Roan",
+      "album": "The Rise and Fall of a Midwest Princess",
+      "spotifyUrl": "https://open.spotify.com/track/4xdBrk0nFZaP54vvZj0yx7",
+      "cover": "https://i.scdn.co/image/ab67616d00001e0296fa88fb1789be437d5cb4b6",
+      "sort": 7
+    },
+    {
+      "id": "7FOgcfdz9Nx5V9lCNXdBYv",
+      "uri": "spotify:track:7FOgcfdz9Nx5V9lCNXdBYv",
+      "title": "Red Wine Supernova",
+      "artist": "Chappell Roan",
+      "album": "The Rise and Fall of a Midwest Princess",
+      "spotifyUrl": "https://open.spotify.com/track/7FOgcfdz9Nx5V9lCNXdBYv",
+      "cover": "https://i.scdn.co/image/ab67616d00001e0296fa88fb1789be437d5cb4b6",
+      "sort": 8
+    },
+    {
+      "id": "6GG73Jik4jUlQCkKg9JuGO",
+      "uri": "spotify:track:6GG73Jik4jUlQCkKg9JuGO",
+      "title": "The Middle",
+      "artist": "Jimmy Eat World",
+      "album": "Bleed American",
+      "spotifyUrl": "https://open.spotify.com/track/6GG73Jik4jUlQCkKg9JuGO",
+      "cover": "https://i.scdn.co/image/ab67616d00001e0295d1d98c5176e4f982bd73d6",
+      "sort": 9
+    },
+    {
+      "id": "5G2f63n7IPVPPjfNIGih7Q",
+      "uri": "spotify:track:5G2f63n7IPVPPjfNIGih7Q",
+      "title": "Taste",
+      "artist": "Sabrina Carpenter",
+      "album": "Short n' Sweet",
+      "spotifyUrl": "https://open.spotify.com/track/5G2f63n7IPVPPjfNIGih7Q",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02fd8d7a8d96871e791cb1f626",
+      "sort": 10
+    },
+    {
+      "id": "4c6vZqYHFur11FbWATIJ9P",
+      "uri": "spotify:track:4c6vZqYHFur11FbWATIJ9P",
+      "title": "There She Goes",
+      "artist": "The La's",
+      "album": "The La's",
+      "spotifyUrl": "https://open.spotify.com/track/4c6vZqYHFur11FbWATIJ9P",
+      "cover": "https://i.scdn.co/image/ab67616d00001e020e42d457a15ef2f133976f6b",
+      "sort": 11
+    },
+    {
+      "id": "754kgU5rWscRTfvlsuEwFp",
+      "uri": "spotify:track:754kgU5rWscRTfvlsuEwFp",
+      "title": "Kiss Me",
+      "artist": "Sixpence None The Richer",
+      "album": "Sixpence None The Richer",
+      "spotifyUrl": "https://open.spotify.com/track/754kgU5rWscRTfvlsuEwFp",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02cfc5eea6cfd77e89ed3ac5a4",
+      "sort": 12
+    },
+    {
+      "id": "2hKdd3qO7cWr2Jo0Bcs0MA",
+      "uri": "spotify:track:2hKdd3qO7cWr2Jo0Bcs0MA",
+      "title": "Drops of Jupiter (Tell Me)",
+      "artist": "Train",
+      "album": "Drops Of Jupiter",
+      "spotifyUrl": "https://open.spotify.com/track/2hKdd3qO7cWr2Jo0Bcs0MA",
+      "cover": "https://i.scdn.co/image/ab67616d00001e021a0278d4109c0f974821aa33",
+      "sort": 13
+    },
+    {
+      "id": "6ORqU0bHbVCRjXm9AjyHyZ",
+      "uri": "spotify:track:6ORqU0bHbVCRjXm9AjyHyZ",
+      "title": "Good Riddance (Time of Your Life)",
+      "artist": "Green Day",
+      "album": "Nimrod",
+      "spotifyUrl": "https://open.spotify.com/track/6ORqU0bHbVCRjXm9AjyHyZ",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02da4f6706ae0f2501c61ce776",
+      "sort": 14
+    },
+    {
+      "id": "1fDsrQ23eTAVFElUMaf38X",
+      "uri": "spotify:track:1fDsrQ23eTAVFElUMaf38X",
+      "title": "American Pie",
+      "artist": "Don McLean",
+      "album": "American Pie",
+      "spotifyUrl": "https://open.spotify.com/track/1fDsrQ23eTAVFElUMaf38X",
+      "cover": "https://i.scdn.co/image/ab67616d00001e020085dd4362653ef4c54ebbeb",
+      "sort": 15
+    },
+    {
+      "id": "2TfSHkHiFO4gRztVIkggkE",
+      "uri": "spotify:track:2TfSHkHiFO4gRztVIkggkE",
+      "title": "Sugar, We're Goin Down",
+      "artist": "Fall Out Boy",
+      "album": "From Under The Cork Tree",
+      "spotifyUrl": "https://open.spotify.com/track/2TfSHkHiFO4gRztVIkggkE",
+      "cover": "https://i.scdn.co/image/ab67616d00001e0271565eda831124be86c603d5",
+      "sort": 16
+    },
+    {
+      "id": "5lDriBxJd22IhOH9zTcFrV",
+      "uri": "spotify:track:5lDriBxJd22IhOH9zTcFrV",
+      "title": "Dirty Little Secret",
+      "artist": "The All-American Rejects",
+      "album": "Move Along",
+      "spotifyUrl": "https://open.spotify.com/track/5lDriBxJd22IhOH9zTcFrV",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02aaf8c068ffe217db825a1945",
+      "sort": 17
+    },
+    {
+      "id": "1fBl642IhJOE5U319Gy2Go",
+      "uri": "spotify:track:1fBl642IhJOE5U319Gy2Go",
+      "title": "Animal",
+      "artist": "Neon Trees",
+      "album": "Habits",
+      "spotifyUrl": "https://open.spotify.com/track/1fBl642IhJOE5U319Gy2Go",
+      "cover": "https://i.scdn.co/image/ab67616d00001e0226ca7305db69aa21efcf2b7a",
+      "sort": 18
+    },
+    {
+      "id": "2m1hi0nfMR9vdGC8UcrnwU",
+      "uri": "spotify:track:2m1hi0nfMR9vdGC8UcrnwU",
+      "title": "All The Small Things",
+      "artist": "blink-182",
+      "album": "Enema Of The State",
+      "spotifyUrl": "https://open.spotify.com/track/2m1hi0nfMR9vdGC8UcrnwU",
+      "cover": "https://i.scdn.co/image/ab67616d00001e026da502e35a7a3e48de2b0f74",
+      "sort": 19
+    },
+    {
+      "id": "756CJtQRFSxEx9jV4P9hpA",
+      "uri": "spotify:track:756CJtQRFSxEx9jV4P9hpA",
+      "title": "I Believe in a Thing Called Love",
+      "artist": "The Darkness",
+      "album": "Permission to Land",
+      "spotifyUrl": "https://open.spotify.com/track/756CJtQRFSxEx9jV4P9hpA",
+      "cover": "https://i.scdn.co/image/ab67616d00001e0228fc13c41950199c0a49424f",
+      "sort": 20
+    },
+    {
+      "id": "0JJP0IS4w0fJx01EcrfkDe",
+      "uri": "spotify:track:0JJP0IS4w0fJx01EcrfkDe",
+      "title": "Dear Maria, Count Me In",
+      "artist": "All Time Low",
+      "album": "So Wrong, It's Right",
+      "spotifyUrl": "https://open.spotify.com/track/0JJP0IS4w0fJx01EcrfkDe",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02c8913cd7b91bb7f6bbbec305",
+      "sort": 21
+    },
+    {
+      "id": "5oQcOu1omDykbIPSdSQQNJ",
+      "uri": "spotify:track:5oQcOu1omDykbIPSdSQQNJ",
+      "title": "1985",
+      "artist": "Bowling For Soup",
+      "album": "A Hangover You Don't Deserve",
+      "spotifyUrl": "https://open.spotify.com/track/5oQcOu1omDykbIPSdSQQNJ",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02f9b3ece3271d3a5fa73d3759",
+      "sort": 22
+    },
+    {
+      "id": "4bPQs0PHn4xbipzdPfn6du",
+      "uri": "spotify:track:4bPQs0PHn4xbipzdPfn6du",
+      "title": "I Write Sins Not Tragedies",
+      "artist": "Panic! At The Disco",
+      "album": "A Fever You Can't Sweat Out",
+      "spotifyUrl": "https://open.spotify.com/track/4bPQs0PHn4xbipzdPfn6du",
+      "cover": "https://i.scdn.co/image/ab67616d00001e023ab3ff3559d2664560e1fdb4",
+      "sort": 23
+    },
+    {
+      "id": "1Dr1fXbc2IxaK1Mu8P8Khz",
+      "uri": "spotify:track:1Dr1fXbc2IxaK1Mu8P8Khz",
+      "title": "When I Come Around",
+      "artist": "Green Day",
+      "album": "Dookie",
+      "spotifyUrl": "https://open.spotify.com/track/1Dr1fXbc2IxaK1Mu8P8Khz",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02db89b08034de626ebee6823d",
+      "sort": 24
+    },
+    {
+      "id": "6nTiIhLmQ3FWhvrGafw2zj",
+      "uri": "spotify:track:6nTiIhLmQ3FWhvrGafw2zj",
+      "title": "American Idiot",
+      "artist": "Green Day",
+      "album": "American Idiot",
+      "spotifyUrl": "https://open.spotify.com/track/6nTiIhLmQ3FWhvrGafw2zj",
+      "cover": "https://i.scdn.co/image/ab67616d00001e0208a1b1e0674086d3f1995e1b",
+      "sort": 25
+    },
+    {
+      "id": "33iv3wnGMrrDugd7GBso1z",
+      "uri": "spotify:track:33iv3wnGMrrDugd7GBso1z",
+      "title": "My Own Worst Enemy",
+      "artist": "Lit",
+      "album": "A Place In The Sun",
+      "spotifyUrl": "https://open.spotify.com/track/33iv3wnGMrrDugd7GBso1z",
+      "cover": "https://i.scdn.co/image/ab67616d00001e027b40b2abdbcb8520874f29ed",
+      "sort": 26
+    },
+    {
+      "id": "1FTSo4v6BOZH9QxKc3MbVM",
+      "uri": "spotify:track:1FTSo4v6BOZH9QxKc3MbVM",
+      "title": "Song 2 - 2012 Remaster",
+      "artist": "Blur",
+      "album": "Blur (Special Edition)",
+      "spotifyUrl": "https://open.spotify.com/track/1FTSo4v6BOZH9QxKc3MbVM",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02de114203356c1f7b136960b6",
+      "sort": 27
+    },
+    {
+      "id": "3d9DChrdc6BOeFsbrZ3Is0",
+      "uri": "spotify:track:3d9DChrdc6BOeFsbrZ3Is0",
+      "title": "Under the Bridge",
+      "artist": "Red Hot Chili Peppers",
+      "album": "Blood Sugar Sex Magik (Deluxe Edition)",
+      "spotifyUrl": "https://open.spotify.com/track/3d9DChrdc6BOeFsbrZ3Is0",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02153d79816d853f2694b2cc70",
+      "sort": 28
+    },
+    {
+      "id": "6WkSUgo1VdpzgtiXKlFPcY",
+      "uri": "spotify:track:6WkSUgo1VdpzgtiXKlFPcY",
+      "title": "Dammit",
+      "artist": "blink-182",
+      "album": "Dude Ranch",
+      "spotifyUrl": "https://open.spotify.com/track/6WkSUgo1VdpzgtiXKlFPcY",
+      "cover": "https://i.scdn.co/image/ab67616d00001e02330500a40905b093b134396a",
+      "sort": 29
+    },
+    {
+      "id": "0zY7SkbIByXGKak663jHuI",
+      "uri": "spotify:track:0zY7SkbIByXGKak663jHuI",
+      "title": "Original Fire",
+      "artist": "Audioslave",
+      "album": "Revelations",
+      "spotifyUrl": "https://open.spotify.com/track/0zY7SkbIByXGKak663jHuI",
+      "cover": "https://i.scdn.co/image/ab67616d00001e022b8ac52203215122968d4d6a",
+      "sort": 30
+    }
+  ]
+}

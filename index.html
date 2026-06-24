@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Les Scaries</title>
+    <title>Scaries Queue</title>
     <meta
       name="description"
-      content="Sing with Les Scaries, browse the song list, see upcoming events, follow Instagram, and tip the band."
+      content="Join the Scaries live-band karaoke queue and browse the local song catalog."
     />
     <style>
       :root {
@@ -14,11 +14,11 @@
         --ink: #f8f3ea;
         --muted: #cdbfb4;
         --line: rgba(248, 243, 234, 0.18);
-        --panel: rgba(20, 18, 20, 0.72);
+        --panel: rgba(20, 18, 20, 0.78);
+        --field: rgba(248, 243, 234, 0.09);
         --red: #d92832;
         --gold: #f5bf4d;
         --green: #4ebf8d;
-        --violet: #7c5cff;
         --black: #0f0d10;
       }
 
@@ -34,7 +34,7 @@
           "Segoe UI", sans-serif;
         color: var(--ink);
         background:
-          linear-gradient(180deg, rgba(15, 13, 16, 0.5), rgba(15, 13, 16, 0.82)),
+          linear-gradient(180deg, rgba(15, 13, 16, 0.54), rgba(15, 13, 16, 0.9)),
           url("assets/les-scaries-stage.png") center / cover fixed,
           #0f0d10;
       }
@@ -44,45 +44,46 @@
         position: fixed;
         inset: 0;
         pointer-events: none;
-        opacity: 0.38;
+        opacity: 0.42;
         background-image:
-          radial-gradient(circle at 50% 30%, rgba(245, 191, 77, 0.18), transparent 19rem),
-          linear-gradient(90deg, rgba(217, 40, 50, 0.28), transparent 22%, transparent 78%, rgba(78, 191, 141, 0.16)),
-          linear-gradient(to bottom, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.72));
+          radial-gradient(circle at 50% 15%, rgba(245, 191, 77, 0.18), transparent 19rem),
+          linear-gradient(90deg, rgba(217, 40, 50, 0.24), transparent 24%, transparent 78%, rgba(78, 191, 141, 0.14)),
+          linear-gradient(to bottom, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.78));
       }
 
       main {
         position: relative;
         z-index: 1;
-        width: min(100%, 680px);
+        width: min(100%, 960px);
         min-height: 100vh;
         margin: 0 auto;
-        padding: clamp(28px, 6vw, 56px) 18px 36px;
+        padding: clamp(18px, 4vw, 42px) 14px 34px;
+      }
+
+      header {
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 24px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
       }
 
       .brand {
-        display: grid;
-        gap: 16px;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        gap: 12px;
       }
 
       .mark {
-        width: 112px;
+        width: 58px;
         aspect-ratio: 1;
-        margin: 0 auto;
         display: grid;
         place-items: center;
         border: 1px solid rgba(248, 243, 234, 0.42);
         border-radius: 50%;
         background:
           radial-gradient(circle at 50% 50%, rgba(217, 40, 50, 0.95) 0 28%, rgba(18, 14, 15, 0.9) 29% 100%);
-        box-shadow:
-          0 22px 60px rgba(0, 0, 0, 0.42),
-          inset 0 0 0 8px rgba(248, 243, 234, 0.08);
+        box-shadow: inset 0 0 0 5px rgba(248, 243, 234, 0.08);
         transform: rotate(-5deg);
       }
 
@@ -106,235 +107,400 @@
         letter-spacing: 0;
       }
 
-      h1 {
+      h1,
+      h2 {
         margin: 0;
-        font-family: Georgia, "Times New Roman", serif;
-        font-size: clamp(46px, 12vw, 82px);
-        line-height: 0.86;
         letter-spacing: 0;
       }
 
-      .tagline {
-        margin: 0 auto;
-        max-width: 32rem;
+      h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(34px, 8vw, 68px);
+        line-height: 0.92;
+      }
+
+      h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(28px, 5vw, 44px);
+        line-height: 0.95;
+      }
+
+      p {
+        margin: 0;
         color: var(--muted);
-        font-size: 16px;
-        line-height: 1.55;
+        line-height: 1.5;
       }
 
-      .links {
-        display: grid;
-        gap: 12px;
+      nav {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
       }
 
-      .link {
-        min-height: 82px;
-        display: grid;
-        grid-template-columns: 52px 1fr auto;
+      a,
+      button {
+        font: inherit;
+      }
+
+      .nav-link,
+      .button,
+      button {
+        min-height: 42px;
+        display: inline-flex;
         align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(248, 243, 234, 0.18);
+        border-radius: 8px;
+        padding: 0 13px;
+        color: var(--ink);
+        background: rgba(248, 243, 234, 0.08);
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .button,
+      button[type="submit"] {
+        color: #130f10;
+        background: var(--gold);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
         gap: 14px;
-        padding: 14px 16px;
+        align-items: start;
+      }
+
+      .panel {
+        display: grid;
+        gap: 14px;
+        padding: clamp(16px, 3vw, 24px);
         border: 1px solid var(--line);
         border-radius: 8px;
-        color: var(--ink);
-        text-decoration: none;
         background: var(--panel);
         backdrop-filter: blur(18px);
-        box-shadow: 0 16px 42px rgba(0, 0, 0, 0.2);
-        transition:
-          transform 160ms ease,
-          border-color 160ms ease,
-          background 160ms ease;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
       }
 
-      .link:hover,
-      .link:focus-visible {
-        transform: translateY(-2px);
-        border-color: rgba(248, 243, 234, 0.42);
-        background: rgba(32, 28, 31, 0.86);
-        outline: none;
+      .panel-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 10px;
       }
 
-      .icon {
-        width: 52px;
+      .count {
+        flex: 0 0 auto;
+        padding: 7px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--gold);
+        background: rgba(0, 0, 0, 0.22);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .queue {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .queue-item {
+        display: grid;
+        grid-template-columns: 42px 1fr 42px;
+        gap: 12px;
+        align-items: center;
+        min-height: 76px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .queue-number {
+        width: 42px;
         aspect-ratio: 1;
         display: grid;
         place-items: center;
         border-radius: 8px;
         color: #130f10;
-        font-size: 24px;
+        background: var(--green);
+        font-weight: 900;
+      }
+
+      .queue-copy {
+        display: grid;
+        gap: 3px;
+        min-width: 0;
+      }
+
+      .queue-copy strong,
+      .queue-copy span,
+      .queue-copy small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .queue-copy small {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .icon-button {
+        width: 42px;
+        padding: 0;
+        color: var(--ink);
+        background: rgba(248, 243, 234, 0.08);
+      }
+
+      .empty {
+        padding: 22px;
+        border: 1px dashed rgba(248, 243, 234, 0.24);
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 7px;
+        font-size: 14px;
         font-weight: 800;
       }
 
-      .red {
-        background: var(--red);
-      }
-
-      .gold {
-        background: var(--gold);
-      }
-
-      .green {
-        background: var(--green);
-      }
-
-      .violet {
-        background: var(--violet);
+      input {
+        width: 100%;
+        min-height: 48px;
+        border: 1px solid rgba(248, 243, 234, 0.2);
+        border-radius: 8px;
+        padding: 12px 13px;
         color: var(--ink);
+        background: var(--field);
+        font: inherit;
       }
 
-      .cream {
-        background: var(--ink);
+      input:focus {
+        border-color: rgba(245, 191, 77, 0.72);
+        outline: 3px solid rgba(245, 191, 77, 0.16);
       }
 
-      .black {
-        background: #171416;
-        color: var(--ink);
+      .search-wrap {
+        position: relative;
       }
 
-      .copy {
+      .search-results {
         display: grid;
-        gap: 4px;
+        gap: 6px;
+        margin-top: 7px;
       }
 
-      .title {
-        font-size: 18px;
-        font-weight: 760;
+      .song-result {
+        min-height: 58px;
+        display: grid;
+        grid-template-columns: 42px 1fr;
+        gap: 10px;
+        justify-content: start;
+        padding: 8px;
+        color: var(--ink);
+        background: rgba(0, 0, 0, 0.38);
+        text-align: left;
       }
 
-      .description {
+      .song-result img,
+      .catalog-song img {
+        width: 42px;
+        aspect-ratio: 1;
+        border-radius: 6px;
+        object-fit: cover;
+        background: rgba(248, 243, 234, 0.1);
+      }
+
+      .song-result span,
+      .selected-song,
+      .catalog-song span {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      small,
+      code {
         color: var(--muted);
-        font-size: 14px;
-        line-height: 1.4;
+        font-size: 12px;
       }
 
-      .arrow {
-        color: var(--muted);
-        font-size: 24px;
+      code {
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
-      footer {
-        text-align: center;
-        color: rgba(248, 243, 234, 0.58);
+      .selected-song {
+        padding: 10px;
+        border: 1px solid rgba(78, 191, 141, 0.5);
+        border-radius: 8px;
+        background: rgba(78, 191, 141, 0.1);
+      }
+
+      .status {
+        min-height: 20px;
+        color: var(--gold);
         font-size: 13px;
+        font-weight: 800;
       }
 
-      @media (max-width: 520px) {
+      .catalog {
+        display: grid;
+        gap: 8px;
+        max-height: 420px;
+        overflow: auto;
+        padding-right: 2px;
+      }
+
+      .catalog-song {
+        display: grid;
+        grid-template-columns: 42px 1fr;
+        gap: 10px;
+        align-items: center;
+        min-height: 58px;
+        padding: 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 800px) {
         body {
           background:
-            linear-gradient(180deg, rgba(15, 13, 16, 0.34), rgba(15, 13, 16, 0.86)),
+            linear-gradient(180deg, rgba(15, 13, 16, 0.5), rgba(15, 13, 16, 0.92)),
             url("assets/les-scaries-stage.png") 50% 0 / auto 100vh no-repeat fixed,
             #0f0d10;
         }
 
-        main {
+        header {
+          display: grid;
+        }
+
+        nav {
           justify-content: start;
         }
 
-        .link {
-          grid-template-columns: 46px 1fr;
-          min-height: 76px;
-        }
-
-        .icon {
-          width: 46px;
-          font-size: 21px;
-        }
-
-        .arrow {
-          display: none;
+        .layout {
+          grid-template-columns: 1fr;
         }
       }
     </style>
   </head>
-  <body>
+  <body data-page="queue">
     <main>
-      <header class="brand">
-        <div class="mark" aria-hidden="true">
-          <svg viewBox="0 0 120 120" role="img">
-            <defs>
-              <path
-                id="scaries-circle"
-                d="M 60 60 m -46 0 a 46 46 0 1 1 92 0 a 46 46 0 1 1 -92 0"
-              />
-            </defs>
-            <text>
-              <textPath href="#scaries-circle" startOffset="50%" text-anchor="middle">
-                SCARIES • SCARIES •
-              </textPath>
-            </text>
-            <text class="center" x="60" y="70" text-anchor="middle">LS</text>
-          </svg>
+      <header>
+        <div class="brand">
+          <div class="mark" aria-hidden="true">
+            <svg viewBox="0 0 120 120" role="img">
+              <defs>
+                <path
+                  id="scaries-circle"
+                  d="M 60 60 m -46 0 a 46 46 0 1 1 92 0 a 46 46 0 1 1 -92 0"
+                />
+              </defs>
+              <text>
+                <textPath href="#scaries-circle" startOffset="50%" text-anchor="middle">
+                  SCARIES - SCARIES -
+                </textPath>
+              </text>
+              <text class="center" x="60" y="70" text-anchor="middle">LS</text>
+            </svg>
+          </div>
+          <div>
+            <h1>Tonight's Queue</h1>
+            <p>Pick a song, add your name, take the stage.</p>
+          </div>
         </div>
-        <div>
-          <h1>Les Scaries</h1>
-          <p class="tagline">
-            A live-band karaoke night for singers, friends, and anyone brave enough to take the mic.
-          </p>
-        </div>
+
+        <nav aria-label="Site links">
+          <a class="nav-link" href="songs.html">Songs</a>
+          <a class="nav-link" href="about.html">About</a>
+          <a class="nav-link" href="https://www.instagram.com/sundayscarysingalongs">Instagram</a>
+          <a class="nav-link" href="https://account.venmo.com/u/itsianmcfarland">Tip</a>
+        </nav>
       </header>
 
-      <section class="links" aria-label="Les Scaries links">
-        <a class="link" href="signup.html" data-link="sing">
-          <span class="icon red" aria-hidden="true">M</span>
-          <span class="copy">
-            <span class="title">Sing a Song</span>
-            <span class="description">Sign up to perform with the band.</span>
-          </span>
-          <span class="arrow" aria-hidden="true">&rarr;</span>
-        </a>
+      <div class="layout">
+        <section class="panel" aria-label="Active queue">
+          <div class="panel-head">
+            <div>
+              <h2>Active Queue</h2>
+              <p>Newest requests appear at the bottom.</p>
+            </div>
+            <span class="count" data-queue-count>0 singers</span>
+          </div>
 
-        <a
-          class="link"
-          href="https://open.spotify.com/playlist/4KyUr7vipHnMKR1Wc5ZtrO?si=b78c5e3c3eaf45b2"
-          data-link="songs"
-        >
-          <span class="icon gold" aria-hidden="true">SL</span>
-          <span class="copy">
-            <span class="title">Song List</span>
-            <span class="description">Browse the full catalog and request a song.</span>
-          </span>
-          <span class="arrow" aria-hidden="true">&rarr;</span>
-        </a>
+          <p class="empty" data-empty-queue>No singers yet. Be first.</p>
+          <ol class="queue" data-queue-list></ol>
 
-        <a class="link" href="about.html" data-link="about">
-          <span class="icon black" aria-hidden="true">NY</span>
-          <span class="copy">
-            <span class="title">About Scaries</span>
-            <span class="description">The event, the band, and the Bushwick backyard origin story.</span>
-          </span>
-          <span class="arrow" aria-hidden="true">&rarr;</span>
-        </a>
+          <div class="actions">
+            <button class="icon-button" type="button" data-clear-queue>Clear</button>
+          </div>
+        </section>
 
-        <a class="link" href="https://www.instagram.com/sundayscarysingalongs" data-link="events">
-          <span class="icon green" aria-hidden="true">D</span>
-          <span class="copy">
-            <span class="title">Upcoming Events</span>
-            <span class="description">Future dates, themes, and ticket links.</span>
-          </span>
-          <span class="arrow" aria-hidden="true">&rarr;</span>
-        </a>
+        <aside class="panel" aria-label="Add yourself">
+          <div>
+            <h2>Join</h2>
+            <p>Search the local catalog. Requests store the Spotify track ID.</p>
+          </div>
 
-        <a class="link" href="https://www.instagram.com/sundayscarysingalongs" data-link="instagram">
-          <span class="icon violet" aria-hidden="true">IG</span>
-          <span class="copy">
-            <span class="title">Instagram</span>
-            <span class="description">Photos, videos, and event updates.</span>
-          </span>
-          <span class="arrow" aria-hidden="true">&rarr;</span>
-        </a>
+          <form data-request-form>
+            <label>
+              Name
+              <input data-singer-name autocomplete="name" required />
+            </label>
 
-        <a class="link" href="https://account.venmo.com/u/itsianmcfarland" data-link="tips">
-          <span class="icon cream" aria-hidden="true">$</span>
-          <span class="copy">
-            <span class="title">Tip the Band</span>
-            <span class="description">Venmo to support the musicians and help keep the event going.</span>
-          </span>
-          <span class="arrow" aria-hidden="true">&rarr;</span>
-        </a>
-      </section>
+            <label class="search-wrap">
+              Song
+              <input
+                data-song-search
+                autocomplete="off"
+                placeholder="Try Brightside, Chappell, blink..."
+                required
+              />
+              <span class="selected-song" data-selected-song hidden></span>
+              <div class="search-results" data-search-results hidden></div>
+            </label>
 
-      <footer>New York, NY</footer>
+            <button type="submit">Add to Queue</button>
+            <p class="status" data-form-status aria-live="polite"></p>
+          </form>
+        </aside>
+
+        <section class="panel" aria-label="Local song catalog">
+          <div class="panel-head">
+            <div>
+              <h2>Song List</h2>
+              <p>Local catalog, no Spotify jump-out.</p>
+            </div>
+            <span class="count" data-song-count>0 songs</span>
+          </div>
+          <input data-catalog-search autocomplete="off" placeholder="Filter songs" />
+          <div class="catalog" data-song-list></div>
+        </section>
+      </div>
     </main>
+
+    <script src="app.js"></script>
   </body>
 </html>
