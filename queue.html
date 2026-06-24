@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Active Queue | Scaries</title>
+    <meta name="description" content="View the active Scaries live-band karaoke queue." />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f8f3ea;
+        --muted: #cdbfb4;
+        --line: rgba(248, 243, 234, 0.18);
+        --panel: rgba(20, 18, 20, 0.78);
+        --gold: #f5bf4d;
+        --green: #4ebf8d;
+        --black: #0f0d10;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(15, 13, 16, 0.54), rgba(15, 13, 16, 0.9)),
+          url("assets/les-scaries-stage.png") center / cover fixed,
+          #0f0d10;
+      }
+
+      main {
+        width: min(100%, 760px);
+        margin: 0 auto;
+        padding: clamp(22px, 5vw, 46px) 16px 34px;
+      }
+
+      a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      h1 {
+        margin: 18px 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(42px, 10vw, 76px);
+        line-height: 0.9;
+        letter-spacing: 0;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .panel {
+        display: grid;
+        gap: 14px;
+        padding: clamp(16px, 4vw, 24px);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        backdrop-filter: blur(18px);
+      }
+
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .count {
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .queue {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .queue-item {
+        display: grid;
+        grid-template-columns: 42px 1fr 42px;
+        gap: 12px;
+        align-items: center;
+        min-height: 76px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .queue-number {
+        width: 42px;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: #130f10;
+        background: var(--green);
+        font-weight: 900;
+      }
+
+      .queue-copy {
+        display: grid;
+        gap: 3px;
+        min-width: 0;
+      }
+
+      .queue-copy strong,
+      .queue-copy span,
+      .queue-copy small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      small,
+      .queue-time {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .queue-time {
+        text-align: right;
+      }
+
+      .empty {
+        padding: 22px;
+        border: 1px dashed rgba(248, 243, 234, 0.24);
+        border-radius: 8px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body data-page="queue">
+    <main>
+      <a href="index.html">&larr; Links</a>
+      <h1>Active Queue</h1>
+      <section class="panel">
+        <div class="panel-head">
+          <p data-backend-status>Connecting...</p>
+          <span class="count" data-queue-count>0 singers</span>
+        </div>
+        <p class="empty" data-empty-queue>No singers in the queue yet.</p>
+        <ol class="queue" data-queue-list></ol>
+      </section>
+    </main>
+
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

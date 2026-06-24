@@ -8,35 +8,56 @@ create table if not exists public.songs (
   sort integer not null default 0
 );
 
+create table if not exists public.app_settings (
+  key text primary key,
+  value text not null
+);
+
 create table if not exists public.queue_requests (
   id uuid primary key default gen_random_uuid(),
   singer text not null,
   singer_key text not null,
+  venmo_handle text not null,
   song_id text not null references public.songs(id),
   device_id text not null,
-  status text not null default 'active' check (status in ('active', 'done', 'removed')),
+  status text not null default 'pending_payment' check (
+    status in (
+      'pending_payment',
+      'accepted',
+      'rejected',
+      'refund_needed',
+      'refunded',
+      'done',
+      'removed'
+    )
+  ),
+  venmo_memo text not null unique,
+  payment_amount numeric(6, 2) not null default 5.00,
+  accepted_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-create index if not exists queue_requests_active_created_idx
-  on public.queue_requests (created_at)
-  where status = 'active';
+create index if not exists queue_requests_accepted_idx
+  on public.queue_requests (accepted_at, created_at)
+  where status = 'accepted';
 
-create index if not exists queue_requests_device_active_idx
+create index if not exists queue_requests_device_open_idx
   on public.queue_requests (device_id)
-  where status = 'active';
+  where status in ('pending_payment', 'accepted');
 
-create index if not exists queue_requests_singer_active_idx
+create index if not exists queue_requests_singer_open_idx
   on public.queue_requests (singer_key)
-  where status = 'active';
+  where status in ('pending_payment', 'accepted');
 
 alter table public.songs enable row level security;
+alter table public.app_settings enable row level security;
 alter table public.queue_requests enable row level security;
 
 grant select on public.songs to anon;
 grant select on public.queue_requests to anon;
-revoke insert, update on public.queue_requests from anon;
+revoke insert, update, delete on public.queue_requests from anon;
+revoke all on public.app_settings from anon;
 
 drop policy if exists "songs are public" on public.songs;
 create policy "songs are public"
@@ -46,10 +67,10 @@ create policy "songs are public"
 
 drop policy if exists "active queue is public" on public.queue_requests;
 drop policy if exists "queue changes are public" on public.queue_requests;
-create policy "queue changes are public"
+create policy "accepted queue is public"
   on public.queue_requests for select
   to anon
-  using (true);
+  using (status = 'accepted');
 
 do $$
 begin
@@ -57,6 +78,10 @@ begin
 exception
   when duplicate_object then null;
 end $$;
+
+insert into public.app_settings (key, value)
+values ('host_code', 'CHANGE-ME')
+on conflict (key) do nothing;
 
 insert into public.songs (id, title, artist, album, spotify_url, cover, sort) values
   ('003vvx7Niy0yvhvHt4a68B', 'Mr. Brightside', 'The Killers', 'Hot Fuss', 'https://open.spotify.com/track/003vvx7Niy0yvhvHt4a68B', 'https://i.scdn.co/image/ab67616d00001e02ccdddd46119a4ff53eaf1f5d', 1),
@@ -97,10 +122,18 @@ on conflict (id) do update set
   cover = excluded.cover,
   sort = excluded.sort;
 
+create or replace function public.make_venmo_memo()
+returns text
+language sql
+as $$
+  select 'SCARIES-' || upper(substr(md5(random()::text || clock_timestamp()::text), 1, 6));
+$$;
+
 create or replace function public.request_song(
   p_singer text,
   p_song_id text,
-  p_device_id text
+  p_device_id text,
+  p_venmo_handle text
 ) returns public.queue_requests
 language plpgsql
 security definer
@@ -109,14 +142,19 @@ as $$
 declare
   v_singer text := trim(coalesce(p_singer, ''));
   v_singer_key text := lower(regexp_replace(trim(coalesce(p_singer, '')), '[^a-zA-Z0-9]+', '', 'g'));
+  v_venmo_handle text := lower(regexp_replace(trim(coalesce(p_venmo_handle, '')), '^@', ''));
   v_song_exists boolean;
-  v_active_by_singer integer;
-  v_active_by_device integer;
+  v_open_by_singer integer;
+  v_open_by_device integer;
   v_recent_by_device integer;
   v_request public.queue_requests;
 begin
   if length(v_singer) < 2 or length(v_singer) > 60 then
     raise exception 'Use a real stage name between 2 and 60 characters.';
+  end if;
+
+  if v_venmo_handle !~ '^[a-z0-9_.-]{3,40}$' then
+    raise exception 'Enter a valid Venmo handle.';
   end if;
 
   if length(coalesce(p_device_id, '')) < 16 then
@@ -130,20 +168,20 @@ begin
     raise exception 'Choose a song from the catalog.';
   end if;
 
-  select count(*) into v_active_by_singer
+  select count(*) into v_open_by_singer
   from public.queue_requests
-  where status = 'active' and singer_key = v_singer_key;
+  where status in ('pending_payment', 'accepted') and singer_key = v_singer_key;
 
-  if v_active_by_singer >= 1 then
-    raise exception 'You already have a song in the queue.';
+  if v_open_by_singer >= 1 then
+    raise exception 'You already have an open request.';
   end if;
 
-  select count(*) into v_active_by_device
+  select count(*) into v_open_by_device
   from public.queue_requests
-  where status = 'active' and device_id = p_device_id;
+  where status in ('pending_payment', 'accepted') and device_id = p_device_id;
 
-  if v_active_by_device >= 2 then
-    raise exception 'This device already has two active requests.';
+  if v_open_by_device >= 2 then
+    raise exception 'This device already has two open requests.';
   end if;
 
   select count(*) into v_recent_by_device
@@ -155,12 +193,123 @@ begin
     raise exception 'Give the queue a minute before adding another song.';
   end if;
 
-  insert into public.queue_requests (singer, singer_key, song_id, device_id)
-  values (v_singer, v_singer_key, p_song_id, p_device_id)
+  insert into public.queue_requests (
+    singer,
+    singer_key,
+    venmo_handle,
+    song_id,
+    device_id,
+    status,
+    venmo_memo
+  )
+  values (
+    v_singer,
+    v_singer_key,
+    v_venmo_handle,
+    p_song_id,
+    p_device_id,
+    'pending_payment',
+    public.make_venmo_memo()
+  )
   returning * into v_request;
 
   return v_request;
 end;
 $$;
 
-grant execute on function public.request_song(text, text, text) to anon;
+create or replace function public.host_code_matches(p_host_code text)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.app_settings
+    where key = 'host_code'
+      and value = coalesce(p_host_code, '')
+      and value <> 'CHANGE-ME'
+  );
+$$;
+
+create or replace function public.host_queue(p_host_code text)
+returns table (
+  id uuid,
+  singer text,
+  venmo_handle text,
+  song_id text,
+  status text,
+  venmo_memo text,
+  payment_amount numeric,
+  created_at timestamptz,
+  accepted_at timestamptz
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    q.id,
+    q.singer,
+    q.venmo_handle,
+    q.song_id,
+    q.status,
+    q.venmo_memo,
+    q.payment_amount,
+    q.created_at,
+    q.accepted_at
+  from public.queue_requests q
+  where public.host_code_matches(p_host_code)
+    and q.status in ('pending_payment', 'accepted', 'refund_needed')
+  order by
+    case q.status
+      when 'pending_payment' then 1
+      when 'accepted' then 2
+      when 'refund_needed' then 3
+      else 4
+    end,
+    coalesce(q.accepted_at, q.created_at);
+$$;
+
+create or replace function public.host_update_request(
+  p_request_id uuid,
+  p_status text,
+  p_host_code text
+) returns public.queue_requests
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_request public.queue_requests;
+begin
+  if not public.host_code_matches(p_host_code) then
+    raise exception 'Invalid host code.';
+  end if;
+
+  if p_status not in ('accepted', 'rejected', 'refund_needed', 'refunded', 'done', 'removed') then
+    raise exception 'Invalid status.';
+  end if;
+
+  update public.queue_requests
+  set
+    status = p_status,
+    accepted_at = case
+      when p_status = 'accepted' and accepted_at is null then now()
+      else accepted_at
+    end,
+    updated_at = now()
+  where id = p_request_id
+  returning * into v_request;
+
+  if v_request.id is null then
+    raise exception 'Request not found.';
+  end if;
+
+  return v_request;
+end;
+$$;
+
+grant execute on function public.request_song(text, text, text, text) to anon;
+grant execute on function public.host_queue(text) to anon;
+grant execute on function public.host_update_request(uuid, text, text) to anon;

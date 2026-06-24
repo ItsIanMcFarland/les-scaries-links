@@ -1,6 +1,9 @@
 const SONGS_URL = "songs.json";
-const QUEUE_KEY = "scaries.activeQueue.v1";
+const QUEUE_KEY = "scaries.queueDemo.v2";
 const DEVICE_KEY = "scaries.deviceId.v1";
+const HOST_KEY = "scaries.hostCode.v1";
+const VENMO_HANDLE = "itsianmcfarland";
+const REQUEST_AMOUNT = "5";
 
 const state = {
   songs: [],
@@ -10,6 +13,7 @@ const state = {
   supabase: null,
   channel: null,
   deviceId: getDeviceId(),
+  hostCode: localStorage.getItem(HOST_KEY) || "",
 };
 
 function getDeviceId() {
@@ -40,6 +44,10 @@ function normalize(value) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
+}
+
+function compactKey(value) {
+  return normalize(value).replace(/\s+/g, "");
 }
 
 function scoreSong(song, query) {
@@ -89,7 +97,8 @@ function isSupabaseConfigured() {
 
 async function initBackend() {
   if (!isSupabaseConfigured()) {
-    setBackendStatus("Local demo queue");
+    setBackendStatus("Local demo mode");
+    await refreshData();
     return;
   }
 
@@ -100,23 +109,23 @@ async function initBackend() {
       window.SCARIES_SUPABASE.anonKey,
     );
 
-    await loadRemoteQueue();
+    await refreshData();
     state.channel = state.supabase
-      .channel("active-queue")
+      .channel("queue-requests")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "queue_requests" },
-        () => loadRemoteQueue(),
+        () => refreshData(),
       )
       .subscribe();
 
-    setBackendStatus("Live queue synced");
+    setBackendStatus("Live backend connected");
   } catch (error) {
     console.error(error);
     state.backend = "local";
     state.supabase = null;
-    state.queue = readQueue();
-    setBackendStatus("Local demo queue");
+    setBackendStatus("Local demo mode");
+    await refreshData();
   }
 }
 
@@ -124,17 +133,28 @@ function setBackendStatus(message) {
   document.querySelectorAll("[data-backend-status]").forEach((element) => {
     element.textContent = message;
   });
-
-  document.querySelectorAll("[data-local-only]").forEach((element) => {
-    element.hidden = state.backend === "supabase";
-  });
 }
 
-async function loadRemoteQueue() {
+async function refreshData() {
+  if (document.body.dataset.page === "host") {
+    await loadHostQueue();
+  } else {
+    await loadPublicQueue();
+  }
+}
+
+async function loadPublicQueue() {
+  if (state.backend !== "supabase") {
+    state.queue = readQueue().filter((entry) => entry.status === "accepted");
+    renderQueue();
+    return;
+  }
+
   const { data, error } = await state.supabase
     .from("queue_requests")
     .select("id,singer,song_id,status,created_at")
-    .eq("status", "active")
+    .eq("status", "accepted")
+    .order("accepted_at", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true });
 
   if (error) throw error;
@@ -142,70 +162,133 @@ async function loadRemoteQueue() {
   renderQueue();
 }
 
-async function addQueueEntry(singer, song) {
+async function loadHostQueue() {
   if (state.backend !== "supabase") {
-    state.queue.push({
-      id: crypto.randomUUID(),
-      singer,
-      songId: song.id,
-      requestedAt: new Date().toISOString(),
-    });
-    writeQueue();
-    renderQueue();
+    state.queue = readQueue().filter((entry) =>
+      ["pending_payment", "accepted", "refund_needed"].includes(entry.status),
+    );
+    renderHostQueue();
     return;
   }
 
-  const { error } = await state.supabase.rpc("request_song", {
+  if (!state.hostCode) {
+    renderHostLocked();
+    return;
+  }
+
+  const { data, error } = await state.supabase.rpc("host_queue", {
+    p_host_code: state.hostCode,
+  });
+
+  if (error) {
+    renderHostLocked(error.message);
+    return;
+  }
+
+  state.queue = data || [];
+  renderHostQueue();
+}
+
+async function createRequest({ singer, venmoHandle, song }) {
+  if (state.backend !== "supabase") {
+    const queue = readQueue();
+    const activeBySinger = queue.filter(
+      (entry) =>
+        ["pending_payment", "accepted"].includes(entry.status) &&
+        compactKey(entry.singer) === compactKey(singer),
+    );
+    const activeByDevice = queue.filter(
+      (entry) =>
+        ["pending_payment", "accepted"].includes(entry.status) &&
+        entry.deviceId === state.deviceId,
+    );
+
+    if (activeBySinger.length >= 1) throw new Error("You already have an open request.");
+    if (activeByDevice.length >= 2) throw new Error("This device already has two open requests.");
+
+    const request = {
+      id: crypto.randomUUID(),
+      singer,
+      singerKey: compactKey(singer),
+      venmoHandle,
+      songId: song.id,
+      status: "pending_payment",
+      venmoMemo: makeMemo(),
+      paymentAmount: REQUEST_AMOUNT,
+      deviceId: state.deviceId,
+      requestedAt: new Date().toISOString(),
+    };
+    state.queue = queue;
+    state.queue.push(request);
+    writeQueue();
+    return request;
+  }
+
+  const { data, error } = await state.supabase.rpc("request_song", {
     p_singer: singer,
     p_song_id: song.id,
     p_device_id: state.deviceId,
+    p_venmo_handle: venmoHandle,
   });
 
   if (error) throw error;
-  await loadRemoteQueue();
+  return data;
 }
 
-async function removeQueueEntry(id) {
+function makeMemo() {
+  return `SCARIES-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+}
+
+function venmoPayUrl({ recipient = VENMO_HANDLE, amount = REQUEST_AMOUNT, memo }) {
+  const params = new URLSearchParams({
+    txn: "pay",
+    recipients: recipient.replace(/^@/, ""),
+    amount,
+    note: memo,
+  });
+  return `venmo://paycharge?${params.toString()}`;
+}
+
+function venmoWebUrl(recipient = VENMO_HANDLE) {
+  return `https://account.venmo.com/u/${encodeURIComponent(recipient.replace(/^@/, ""))}`;
+}
+
+async function hostUpdate(id, status) {
   if (state.backend !== "supabase") {
-    state.queue = state.queue.filter((entry) => entry.id !== id);
+    state.queue = readQueue().map((entry) =>
+      entry.id === id
+        ? {
+            ...entry,
+            status,
+            acceptedAt: status === "accepted" ? new Date().toISOString() : entry.acceptedAt,
+            updatedAt: new Date().toISOString(),
+          }
+        : entry,
+    );
     writeQueue();
-    renderQueue();
+    await loadHostQueue();
     return;
   }
 
-  const { error } = await state.supabase
-    .from("queue_requests")
-    .update({ status: "removed", updated_at: new Date().toISOString() })
-    .eq("id", id);
+  const { error } = await state.supabase.rpc("host_update_request", {
+    p_request_id: id,
+    p_status: status,
+    p_host_code: state.hostCode,
+  });
 
   if (error) throw error;
-  await loadRemoteQueue();
+  await loadHostQueue();
 }
 
-async function clearQueue() {
-  if (state.backend !== "supabase") {
-    state.queue = [];
-    writeQueue();
-    renderQueue();
-    return;
-  }
-
-  const { error } = await state.supabase
-    .from("queue_requests")
-    .update({ status: "removed", updated_at: new Date().toISOString() })
-    .eq("status", "active");
-
-  if (error) throw error;
-  await loadRemoteQueue();
-}
-
-function initSearchForm(options = {}) {
+function initRequestForm() {
   const form = document.querySelector("[data-request-form]");
   const searchInput = document.querySelector("[data-song-search]");
   const singerInput = document.querySelector("[data-singer-name]");
+  const venmoInput = document.querySelector("[data-venmo-handle]");
   const results = document.querySelector("[data-search-results]");
   const selected = document.querySelector("[data-selected-song]");
   const status = document.querySelector("[data-form-status]");
+  const payment = document.querySelector("[data-payment-panel]");
 
   if (!form || !searchInput || !results) return;
 
@@ -240,7 +323,7 @@ function initSearchForm(options = {}) {
             <img src="${song.cover}" alt="" loading="lazy" />
             <span>
               <strong>${escapeHtml(song.title)}</strong>
-            <small>${escapeHtml(song.artist)}</small>
+              <small>${escapeHtml(song.artist)}</small>
             </span>
           </button>
         `,
@@ -261,11 +344,18 @@ function initSearchForm(options = {}) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const singer = singerInput.value.trim();
+    const venmoHandle = venmoInput.value.trim().replace(/^@/, "");
     const song = state.selectedSong;
 
     if (!singer) {
       status.textContent = "Add your name first.";
       singerInput.focus();
+      return;
+    }
+
+    if (!venmoHandle) {
+      status.textContent = "Add your Venmo handle so refunds are easy.";
+      venmoInput.focus();
       return;
     }
 
@@ -276,21 +366,44 @@ function initSearchForm(options = {}) {
     }
 
     try {
-      status.textContent = "Adding...";
-      await addQueueEntry(singer, song);
+      status.textContent = "Creating payment memo...";
+      const request = await createRequest({ singer, venmoHandle, song });
       form.reset();
       state.selectedSong = null;
       selected.hidden = true;
       results.hidden = true;
-      status.textContent = `${song.title} is in the queue.`;
-
-      if (options.redirectToQueue) {
-        window.location.href = "index.html";
-      }
+      status.textContent = "Request created. Venmo with the memo below.";
+      renderPaymentPanel(payment, request, song);
     } catch (error) {
-      status.textContent = error.message || "Could not add that request.";
+      status.textContent = error.message || "Could not create that request.";
     }
   });
+}
+
+function renderPaymentPanel(panel, request, song) {
+  if (!panel) return;
+  const memo = request.venmo_memo || request.venmoMemo;
+  const amount = String(request.payment_amount || request.paymentAmount || REQUEST_AMOUNT);
+  const payUrl = venmoPayUrl({ amount, memo });
+
+  panel.hidden = false;
+  panel.innerHTML = `
+    <h2>Venmo to finish</h2>
+    <p>Your request is pending until the host sees the Venmo payment.</p>
+    <div class="payment-code">
+      <span>Memo</span>
+      <strong>${escapeHtml(memo)}</strong>
+    </div>
+    <div class="payment-code">
+      <span>Amount</span>
+      <strong>$${escapeHtml(amount)}</strong>
+    </div>
+    <p>${escapeHtml(song.title)} - ${escapeHtml(song.artist)}</p>
+    <div class="actions">
+      <a class="button" href="${payUrl}">Open Venmo</a>
+      <a class="button secondary" href="${venmoWebUrl()}">Venmo Profile</a>
+    </div>
+  `;
 }
 
 function renderQueue() {
@@ -316,15 +429,104 @@ function renderQueue() {
             <span>${song ? escapeHtml(song.title) : "Unknown song"}</span>
             <small>${song ? `${escapeHtml(song.artist)} - ${escapeHtml(song.id)}` : escapeHtml(getEntrySongId(entry))}</small>
           </span>
-          ${
-            state.backend === "local"
-              ? `<button type="button" class="icon-button" data-remove-entry="${entry.id}" aria-label="Remove ${escapeHtml(entry.singer)}">x</button>`
-              : `<span class="queue-time">${formatQueueTime(getEntryTime(entry))}</span>`
-          }
+          <span class="queue-time">${formatQueueTime(getEntryTime(entry))}</span>
         </li>
       `;
     })
     .join("");
+}
+
+function initHost() {
+  const form = document.querySelector("[data-host-login]");
+  const input = document.querySelector("[data-host-code]");
+  const refresh = document.querySelector("[data-host-refresh]");
+
+  if (!form) return;
+
+  input.value = state.hostCode;
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    state.hostCode = input.value.trim();
+    localStorage.setItem(HOST_KEY, state.hostCode);
+    await loadHostQueue();
+  });
+
+  refresh?.addEventListener("click", () => loadHostQueue());
+}
+
+function renderHostLocked(message = "Enter the host code to manage requests.") {
+  const list = document.querySelector("[data-host-list]");
+  const status = document.querySelector("[data-host-status]");
+  if (status) status.textContent = message;
+  if (list) list.innerHTML = "";
+}
+
+function renderHostQueue() {
+  const list = document.querySelector("[data-host-list]");
+  const status = document.querySelector("[data-host-status]");
+  if (!list) return;
+
+  if (status) status.textContent = `${state.queue.length} requests`;
+  list.innerHTML = state.queue
+    .map((entry) => {
+      const song = getSong(getEntrySongId(entry));
+      const memo = entry.venmo_memo || entry.venmoMemo || "";
+      const venmo = entry.venmo_handle || entry.venmoHandle || "";
+      const amount = String(entry.payment_amount || entry.paymentAmount || REQUEST_AMOUNT);
+      const refundMemo = `Refund ${memo} - ${song ? song.title : "Scaries request"}`;
+      return `
+        <article class="host-card">
+          <div>
+            <strong>${escapeHtml(entry.singer)}</strong>
+            <span>${song ? escapeHtml(song.title) : "Unknown song"}</span>
+            <small>${song ? escapeHtml(song.artist) : escapeHtml(getEntrySongId(entry))}</small>
+          </div>
+          <div class="host-meta">
+            <code>${escapeHtml(memo)}</code>
+            <span>${escapeHtml(statusLabel(entry.status))}</span>
+            <a href="${venmoWebUrl(venmo)}">@${escapeHtml(venmo)}</a>
+          </div>
+          <div class="host-actions">
+            <button type="button" data-host-action="accepted" data-request-id="${entry.id}">Paid / Add</button>
+            <button type="button" data-host-action="rejected" data-request-id="${entry.id}">Reject</button>
+            <button type="button" data-host-action="refund_needed" data-request-id="${entry.id}">Refund Needed</button>
+            <a class="button secondary" href="${venmoPayUrl({
+              recipient: venmo,
+              amount,
+              memo: refundMemo,
+            })}">Open Refund</a>
+            <button type="button" data-host-action="refunded" data-request-id="${entry.id}">Refunded</button>
+            <button type="button" data-host-action="done" data-request-id="${entry.id}">Done</button>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  list.querySelectorAll("[data-host-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      try {
+        await hostUpdate(button.dataset.requestId, button.dataset.hostAction);
+      } catch (error) {
+        if (status) status.textContent = error.message || "Host update failed.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+}
+
+function statusLabel(status) {
+  return {
+    pending_payment: "Pending payment",
+    accepted: "In queue",
+    rejected: "Rejected",
+    refund_needed: "Refund needed",
+    refunded: "Refunded",
+    done: "Done",
+    removed: "Removed",
+  }[status] || status;
 }
 
 function formatQueueTime(value) {
@@ -333,21 +535,6 @@ function formatQueueTime(value) {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(value));
-}
-
-function initQueueControls() {
-  const list = document.querySelector("[data-queue-list]");
-  const clear = document.querySelector("[data-clear-queue]");
-
-  list?.addEventListener("click", async (event) => {
-    const button = event.target.closest("[data-remove-entry]");
-    if (!button) return;
-    await removeQueueEntry(button.dataset.removeEntry);
-  });
-
-  clear?.addEventListener("click", async () => {
-    await clearQueue();
-  });
 }
 
 function renderSongList() {
@@ -388,7 +575,7 @@ function escapeHtml(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-  .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;");
 }
 
 async function boot() {
@@ -397,8 +584,8 @@ async function boot() {
   state.songs = catalog.songs;
   await initBackend();
 
-  initSearchForm({ redirectToQueue: document.body.dataset.page === "request" });
-  initQueueControls();
+  initRequestForm();
+  initHost();
   renderQueue();
   renderSongList();
 }

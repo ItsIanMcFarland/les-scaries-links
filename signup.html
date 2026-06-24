@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Join the Queue | Scaries</title>
-    <meta name="description" content="Add yourself to the Scaries live-band karaoke queue." />
+    <title>Request a Song | Scaries</title>
+    <meta name="description" content="Request a song for Scaries live-band karaoke." />
     <style>
       :root {
         color-scheme: dark;
@@ -36,12 +36,10 @@
       }
 
       main {
-        width: min(100%, 560px);
-        min-height: 100vh;
+        width: min(100%, 600px);
         margin: 0 auto;
         padding: clamp(22px, 5vw, 46px) 16px 34px;
         display: grid;
-        align-content: center;
         gap: 16px;
       }
 
@@ -50,12 +48,20 @@
         text-decoration: none;
       }
 
-      h1 {
+      h1,
+      h2 {
         margin: 0;
         font-family: Georgia, "Times New Roman", serif;
-        font-size: clamp(42px, 11vw, 74px);
         line-height: 0.9;
         letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: clamp(42px, 11vw, 74px);
+      }
+
+      h2 {
+        font-size: clamp(30px, 8vw, 48px);
       }
 
       p {
@@ -103,15 +109,26 @@
         outline: 3px solid rgba(245, 191, 77, 0.16);
       }
 
-      button {
+      button,
+      .button {
         min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         border: 1px solid rgba(248, 243, 234, 0.18);
         border-radius: 8px;
+        padding: 0 14px;
         color: #130f10;
         background: var(--gold);
         font: inherit;
         font-weight: 900;
+        text-decoration: none;
         cursor: pointer;
+      }
+
+      .secondary {
+        color: var(--ink);
+        background: rgba(248, 243, 234, 0.08);
       }
 
       .search-results {
@@ -163,16 +180,48 @@
         font-size: 13px;
         font-weight: 800;
       }
+
+      .payment-code {
+        display: grid;
+        gap: 4px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.24);
+      }
+
+      .payment-code span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .payment-code strong {
+        font-size: 24px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      @media (max-width: 520px) {
+        .actions {
+          display: grid;
+        }
+      }
     </style>
   </head>
   <body data-page="request">
     <main>
-      <a href="index.html">&larr; Queue</a>
+      <a href="index.html">&larr; Links</a>
 
       <section class="panel">
         <div>
-          <h1>Join</h1>
-          <p>Just your name and song. The song stores a Spotify track ID.</p>
+          <h1>Request</h1>
+          <p>Pick your song, add your Venmo handle, then pay with the generated memo.</p>
           <p class="status" data-backend-status>Connecting...</p>
         </div>
 
@@ -183,16 +232,23 @@
           </label>
 
           <label>
+            Venmo handle
+            <input data-venmo-handle autocomplete="off" placeholder="@yourhandle" required />
+          </label>
+
+          <label>
             Song
             <input data-song-search autocomplete="off" placeholder="Search by song or artist" required />
             <span class="selected-song" data-selected-song hidden></span>
             <div class="search-results" data-search-results hidden></div>
           </label>
 
-          <button type="submit">Add to Queue</button>
+          <button type="submit">Create Venmo Memo</button>
           <p class="status" data-form-status aria-live="polite"></p>
         </form>
       </section>
+
+      <section class="panel" data-payment-panel hidden></section>
     </main>
 
     <script src="supabase-config.js"></script>
