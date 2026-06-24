@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About Scaries | Les Scaries</title>
+    <meta
+      name="description"
+      content="Learn about Scaries, a recurring live-band karaoke event with a professional house band."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f8f3ea;
+        --muted: #cdbfb4;
+        --line: rgba(248, 243, 234, 0.18);
+        --panel: rgba(20, 18, 20, 0.76);
+        --red: #d92832;
+        --gold: #f5bf4d;
+        --green: #4ebf8d;
+        --black: #0f0d10;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(15, 13, 16, 0.6), rgba(15, 13, 16, 0.92)),
+          url("assets/les-scaries-stage.png") center / cover fixed,
+          #0f0d10;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.42;
+        background-image:
+          radial-gradient(circle at 50% 18%, rgba(245, 191, 77, 0.16), transparent 18rem),
+          linear-gradient(90deg, rgba(217, 40, 50, 0.26), transparent 24%, transparent 78%, rgba(78, 191, 141, 0.14)),
+          linear-gradient(to bottom, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.76));
+      }
+
+      main {
+        position: relative;
+        z-index: 1;
+        width: min(100%, 920px);
+        margin: 0 auto;
+        padding: clamp(24px, 5vw, 56px) 18px 40px;
+      }
+
+      .back {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+        margin-bottom: 22px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .back:hover,
+      .back:focus-visible {
+        color: var(--ink);
+        outline: none;
+      }
+
+      header {
+        display: grid;
+        gap: 12px;
+        max-width: 760px;
+        margin-bottom: 24px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(48px, 10vw, 92px);
+        line-height: 0.88;
+      }
+
+      h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(30px, 6vw, 52px);
+        line-height: 0.95;
+      }
+
+      h3 {
+        font-size: 18px;
+        line-height: 1.1;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.62;
+      }
+
+      .lead {
+        max-width: 42rem;
+        font-size: 18px;
+      }
+
+      .section {
+        display: grid;
+        gap: 16px;
+        margin-top: 16px;
+        padding: clamp(18px, 4vw, 28px);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+      }
+
+      .copy {
+        display: grid;
+        gap: 13px;
+      }
+
+      .band {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .member {
+        display: grid;
+        gap: 7px;
+        min-height: 180px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .role {
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .button {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(248, 243, 234, 0.18);
+        border-radius: 8px;
+        padding: 0 16px;
+        color: #130f10;
+        background: var(--gold);
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .secondary {
+        color: var(--ink);
+        background: rgba(248, 243, 234, 0.08);
+      }
+
+      @media (max-width: 720px) {
+        body {
+          background:
+            linear-gradient(180deg, rgba(15, 13, 16, 0.5), rgba(15, 13, 16, 0.92)),
+            url("assets/les-scaries-stage.png") 50% 0 / auto 100vh no-repeat fixed,
+            #0f0d10;
+        }
+
+        .band {
+          grid-template-columns: 1fr;
+        }
+
+        .actions {
+          display: grid;
+        }
+
+        .button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="index.html">&larr; Les Scaries</a>
+
+      <header>
+        <h1>About Scaries</h1>
+        <p class="lead">
+          Scaries is a recurring live-band karaoke event where audience members take the
+          stage backed by a professional house band.
+        </p>
+      </header>
+
+      <section class="section">
+        <h2>The Event</h2>
+        <div class="copy">
+          <p>
+            The band performs full arrangements of pop, rock, emo, punk, indie, and
+            alternative favorites.
+          </p>
+          <p>
+            Part concert, part karaoke, part community gathering, Scaries turns a typical
+            night into a sing-along party where first-time singers, local musicians, and
+            neighborhood regulars share the same stage.
+          </p>
+          <p>
+            Unlike traditional karaoke, every song is performed live by the band, creating an
+            experience that feels somewhere between a rock show and an open mic.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>The Band</h2>
+        <div class="band">
+          <article class="member">
+            <div>
+              <h3>Ian McFarland</h3>
+              <div class="role">Guitar &amp; Vocals</div>
+            </div>
+            <p>
+              Brooklyn-based singer-songwriter and originator of Scaries. Ian serves as host,
+              guitarist, and occasional ringmaster for the night's chaos.
+            </p>
+          </article>
+
+          <article class="member">
+            <div>
+              <h3>Jared Pease</h3>
+              <div class="role">Drums</div>
+            </div>
+            <p>
+              A powerhouse drummer, producer, and engineer whose energy drives the band
+              through everything from pop singalongs to emo anthems.
+            </p>
+          </article>
+
+          <article class="member">
+            <div>
+              <h3>Rijk van Zanten</h3>
+              <div class="role">Bass</div>
+            </div>
+            <p>
+              Bassist and longtime Scaries collaborator, holding down the low end while
+              helping keep the show running smoothly on and off stage.
+            </p>
+          </article>
+
+          <article class="member">
+            <div>
+              <h3>Nick Prez</h3>
+              <div class="role">Keys &amp; Vocals</div>
+            </div>
+            <p>
+              Keyboardist, vocalist, and songwriter known for his versatility, harmonies, and
+              knack for elevating every song he touches.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>The History</h2>
+        <div class="copy">
+          <p>
+            Scaries began in a backyard in Bushwick as a semi-regular potluck and live-music
+            hang where friends, local musicians, and adventurous singers would gather to call
+            everything from Backstreet Boys and show tunes to classic rock, emo, pop-punk, and
+            the occasional wildly ambitious deep cut.
+          </p>
+          <p>
+            The atmosphere was equal parts rehearsal, party, and happy accident. Sometimes it
+            ended with a restart from the top, other times with spontaneous three-part
+            harmonies appearing out of nowhere.
+          </p>
+          <p>
+            After a few noise complaints and a growing crowd, the event found an unlikely
+            champion in Baker Falls owner Nick Bodor during the venue's reopening. What began
+            as an occasional experiment soon became a recurring fixture at Baker Falls, growing
+            into a bi-monthly event that has welcomed hundreds of singers to the stage and
+            built a loyal community of regulars, musicians, and first-timers alike.
+          </p>
+        </div>
+      </section>
+
+      <nav class="actions" aria-label="Next actions">
+        <a class="button" href="signup.html">Sing a Song</a>
+        <a
+          class="button secondary"
+          href="https://open.spotify.com/playlist/4KyUr7vipHnMKR1Wc5ZtrO?si=b78c5e3c3eaf45b2"
+        >
+          Browse Songs
+        </a>
+      </nav>
+    </main>
+  </body>
+</html>
