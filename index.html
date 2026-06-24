@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Les Scaries</title>
+    <meta
+      name="description"
+      content="Sing with Les Scaries, browse the song list, see upcoming events, follow Instagram, and tip the band."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f8f3ea;
+        --muted: #cdbfb4;
+        --line: rgba(248, 243, 234, 0.18);
+        --panel: rgba(20, 18, 20, 0.72);
+        --red: #d92832;
+        --gold: #f5bf4d;
+        --green: #4ebf8d;
+        --violet: #7c5cff;
+        --black: #0f0d10;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 14% 8%, rgba(217, 40, 50, 0.46), transparent 27rem),
+          radial-gradient(circle at 86% 18%, rgba(78, 191, 141, 0.28), transparent 26rem),
+          linear-gradient(135deg, #151015 0%, #221518 42%, #0f0d10 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.23;
+        background-image:
+          linear-gradient(rgba(248, 243, 234, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(248, 243, 234, 0.06) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(to bottom, #000, transparent 78%);
+      }
+
+      main {
+        width: min(100%, 680px);
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: clamp(28px, 6vw, 56px) 18px 36px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 24px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 16px;
+        text-align: center;
+      }
+
+      .mark {
+        width: 96px;
+        aspect-ratio: 1;
+        margin: 0 auto;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(145deg, rgba(217, 40, 50, 0.9), rgba(15, 13, 16, 0.7)),
+          repeating-linear-gradient(90deg, transparent 0 8px, rgba(248, 243, 234, 0.08) 8px 10px);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.32);
+        transform: rotate(-2deg);
+      }
+
+      .mark span {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 44px;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(46px, 12vw, 82px);
+        line-height: 0.86;
+        letter-spacing: 0;
+      }
+
+      .tagline {
+        margin: 0 auto;
+        max-width: 32rem;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.55;
+      }
+
+      .links {
+        display: grid;
+        gap: 12px;
+      }
+
+      .link {
+        min-height: 82px;
+        display: grid;
+        grid-template-columns: 52px 1fr auto;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        text-decoration: none;
+        background: var(--panel);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 16px 42px rgba(0, 0, 0, 0.2);
+        transition:
+          transform 160ms ease,
+          border-color 160ms ease,
+          background 160ms ease;
+      }
+
+      .link:hover,
+      .link:focus-visible {
+        transform: translateY(-2px);
+        border-color: rgba(248, 243, 234, 0.42);
+        background: rgba(32, 28, 31, 0.86);
+        outline: none;
+      }
+
+      .icon {
+        width: 52px;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: #130f10;
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      .red {
+        background: var(--red);
+      }
+
+      .gold {
+        background: var(--gold);
+      }
+
+      .green {
+        background: var(--green);
+      }
+
+      .violet {
+        background: var(--violet);
+        color: var(--ink);
+      }
+
+      .cream {
+        background: var(--ink);
+      }
+
+      .copy {
+        display: grid;
+        gap: 4px;
+      }
+
+      .title {
+        font-size: 18px;
+        font-weight: 760;
+      }
+
+      .description {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .arrow {
+        color: var(--muted);
+        font-size: 24px;
+      }
+
+      footer {
+        text-align: center;
+        color: rgba(248, 243, 234, 0.58);
+        font-size: 13px;
+      }
+
+      @media (max-width: 520px) {
+        main {
+          justify-content: start;
+        }
+
+        .link {
+          grid-template-columns: 46px 1fr;
+          min-height: 76px;
+        }
+
+        .icon {
+          width: 46px;
+          font-size: 21px;
+        }
+
+        .arrow {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="brand">
+        <div class="mark" aria-hidden="true"><span>LS</span></div>
+        <div>
+          <h1>Les Scaries</h1>
+          <p class="tagline">
+            A live-band karaoke night for singers, friends, and anyone brave enough to take the mic.
+          </p>
+        </div>
+      </header>
+
+      <section class="links" aria-label="Les Scaries links">
+        <a class="link" href="REPLACE_WITH_SIGNUP_URL" data-link="sing">
+          <span class="icon red" aria-hidden="true">M</span>
+          <span class="copy">
+            <span class="title">Sing a Song</span>
+            <span class="description">Sign up to perform with the band.</span>
+          </span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+
+        <a class="link" href="REPLACE_WITH_SONG_LIST_URL" data-link="songs">
+          <span class="icon gold" aria-hidden="true">SL</span>
+          <span class="copy">
+            <span class="title">Song List</span>
+            <span class="description">Browse the full catalog and request a song.</span>
+          </span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+
+        <a class="link" href="REPLACE_WITH_EVENTS_URL" data-link="events">
+          <span class="icon green" aria-hidden="true">D</span>
+          <span class="copy">
+            <span class="title">Upcoming Events</span>
+            <span class="description">Future dates, themes, and ticket links.</span>
+          </span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+
+        <a class="link" href="REPLACE_WITH_CORRECT_INSTAGRAM_URL" data-link="instagram">
+          <span class="icon violet" aria-hidden="true">IG</span>
+          <span class="copy">
+            <span class="title">Instagram</span>
+            <span class="description">Photos, videos, and event updates.</span>
+          </span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+
+        <a class="link" href="REPLACE_WITH_VENMO_URL" data-link="tips">
+          <span class="icon cream" aria-hidden="true">$</span>
+          <span class="copy">
+            <span class="title">Tip the Band</span>
+            <span class="description">Venmo to support the musicians and help keep the event going.</span>
+          </span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </section>
+
+      <footer>New York, NY</footer>
+    </main>
+  </body>
+</html>
