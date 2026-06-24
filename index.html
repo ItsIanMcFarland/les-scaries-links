@@ -34,9 +34,9 @@
           "Segoe UI", sans-serif;
         color: var(--ink);
         background:
-          radial-gradient(circle at 14% 8%, rgba(217, 40, 50, 0.46), transparent 27rem),
-          radial-gradient(circle at 86% 18%, rgba(78, 191, 141, 0.28), transparent 26rem),
-          linear-gradient(135deg, #151015 0%, #221518 42%, #0f0d10 100%);
+          linear-gradient(180deg, rgba(15, 13, 16, 0.5), rgba(15, 13, 16, 0.82)),
+          url("assets/les-scaries-stage.png") center / cover fixed,
+          #0f0d10;
       }
 
       body::before {
@@ -44,15 +44,16 @@
         position: fixed;
         inset: 0;
         pointer-events: none;
-        opacity: 0.23;
+        opacity: 0.38;
         background-image:
-          linear-gradient(rgba(248, 243, 234, 0.08) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(248, 243, 234, 0.06) 1px, transparent 1px);
-        background-size: 32px 32px;
-        mask-image: linear-gradient(to bottom, #000, transparent 78%);
+          radial-gradient(circle at 50% 30%, rgba(245, 191, 77, 0.18), transparent 19rem),
+          linear-gradient(90deg, rgba(217, 40, 50, 0.28), transparent 22%, transparent 78%, rgba(78, 191, 141, 0.16)),
+          linear-gradient(to bottom, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.72));
       }
 
       main {
+        position: relative;
+        z-index: 1;
         width: min(100%, 680px);
         min-height: 100vh;
         margin: 0 auto;
@@ -70,23 +71,38 @@
       }
 
       .mark {
-        width: 96px;
+        width: 112px;
         aspect-ratio: 1;
         margin: 0 auto;
         display: grid;
         place-items: center;
-        border: 1px solid var(--line);
+        border: 1px solid rgba(248, 243, 234, 0.42);
+        border-radius: 50%;
         background:
-          linear-gradient(145deg, rgba(217, 40, 50, 0.9), rgba(15, 13, 16, 0.7)),
-          repeating-linear-gradient(90deg, transparent 0 8px, rgba(248, 243, 234, 0.08) 8px 10px);
-        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.32);
-        transform: rotate(-2deg);
+          radial-gradient(circle at 50% 50%, rgba(217, 40, 50, 0.95) 0 28%, rgba(18, 14, 15, 0.9) 29% 100%);
+        box-shadow:
+          0 22px 60px rgba(0, 0, 0, 0.42),
+          inset 0 0 0 8px rgba(248, 243, 234, 0.08);
+        transform: rotate(-5deg);
       }
 
-      .mark span {
+      .mark svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      .mark text {
+        fill: var(--ink);
+        font-size: 15px;
+        font-weight: 900;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+      }
+
+      .mark .center {
         font-family: Georgia, "Times New Roman", serif;
-        font-size: 44px;
-        font-weight: 800;
+        font-size: 34px;
         letter-spacing: 0;
       }
 
@@ -199,6 +215,13 @@
       }
 
       @media (max-width: 520px) {
+        body {
+          background:
+            linear-gradient(180deg, rgba(15, 13, 16, 0.34), rgba(15, 13, 16, 0.86)),
+            url("assets/les-scaries-stage.png") 50% 0 / auto 100vh no-repeat fixed,
+            #0f0d10;
+        }
+
         main {
           justify-content: start;
         }
@@ -222,7 +245,22 @@
   <body>
     <main>
       <header class="brand">
-        <div class="mark" aria-hidden="true"><span>LS</span></div>
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 120 120" role="img">
+            <defs>
+              <path
+                id="scaries-circle"
+                d="M 60 60 m -46 0 a 46 46 0 1 1 92 0 a 46 46 0 1 1 -92 0"
+              />
+            </defs>
+            <text>
+              <textPath href="#scaries-circle" startOffset="50%" text-anchor="middle">
+                SCARIES • SCARIES •
+              </textPath>
+            </text>
+            <text class="center" x="60" y="70" text-anchor="middle">LS</text>
+          </svg>
+        </div>
         <div>
           <h1>Les Scaries</h1>
           <p class="tagline">
