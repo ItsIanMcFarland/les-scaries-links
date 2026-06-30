@@ -454,19 +454,60 @@ function initHost() {
   refresh?.addEventListener("click", () => loadHostQueue());
 }
 
-function renderHostLocked(message = "Enter the host code to manage requests.") {
+function renderHostLocked(message = "Enter the host code to run the door.") {
   const list = document.querySelector("[data-host-list]");
   const status = document.querySelector("[data-host-status]");
+  const stats = document.querySelector("[data-host-stats]");
   if (status) status.textContent = message;
   if (list) list.innerHTML = "";
+  if (stats) {
+    stats.hidden = true;
+    stats.innerHTML = "";
+  }
 }
 
 function renderHostQueue() {
   const list = document.querySelector("[data-host-list]");
   const status = document.querySelector("[data-host-status]");
+  const stats = document.querySelector("[data-host-stats]");
   if (!list) return;
 
-  if (status) status.textContent = `${state.queue.length} requests`;
+  const counts = {
+    pending: state.queue.filter((entry) => entry.status === "pending_payment").length,
+    accepted: state.queue.filter((entry) => entry.status === "accepted").length,
+    refunds: state.queue.filter((entry) => entry.status === "refund_needed").length,
+  };
+
+  if (status) {
+    status.textContent =
+      state.backend === "supabase"
+        ? "Live door is open."
+        : "Local demo door is open.";
+  }
+
+  if (stats) {
+    stats.hidden = false;
+    stats.innerHTML = `
+      <div class="door-stat">
+        <strong>${counts.pending}</strong>
+        <span>Need yes/no</span>
+      </div>
+      <div class="door-stat">
+        <strong>${counts.accepted}</strong>
+        <span>In queue</span>
+      </div>
+      <div class="door-stat">
+        <strong>${counts.refunds}</strong>
+        <span>Refunds</span>
+      </div>
+    `;
+  }
+
+  if (state.queue.length === 0) {
+    list.innerHTML = `<p class="empty-door">No requests at the door right now.</p>`;
+    return;
+  }
+
   list.innerHTML = state.queue
     .map((entry) => {
       const song = getSong(getEntrySongId(entry));
@@ -475,28 +516,31 @@ function renderHostQueue() {
       const amount = String(entry.payment_amount || entry.paymentAmount || REQUEST_AMOUNT);
       const refundMemo = `Refund ${memo} - ${song ? song.title : "Scaries request"}`;
       return `
-        <article class="host-card">
+        <article class="host-card ${escapeHtml(entry.status)}">
+          <div class="host-topline">
+            <strong>${escapeHtml(entry.singer || "Unknown singer")}</strong>
+            <span class="status-pill">${escapeHtml(statusLabel(entry.status))}</span>
+          </div>
           <div>
-            <strong>${escapeHtml(entry.singer)}</strong>
             <span>${song ? escapeHtml(song.title) : "Unknown song"}</span>
             <small>${song ? escapeHtml(song.artist) : escapeHtml(getEntrySongId(entry))}</small>
           </div>
           <div class="host-meta">
             <code>${escapeHtml(memo)}</code>
-            <span>${escapeHtml(statusLabel(entry.status))}</span>
+            <span>$${escapeHtml(amount)}</span>
             <a href="${venmoWebUrl(venmo)}">@${escapeHtml(venmo)}</a>
           </div>
           <div class="host-actions">
-            <button type="button" data-host-action="accepted" data-request-id="${entry.id}">Paid / Add</button>
-            <button type="button" data-host-action="rejected" data-request-id="${entry.id}">Reject</button>
-            <button type="button" data-host-action="refund_needed" data-request-id="${entry.id}">Refund Needed</button>
+            <button class="yes" type="button" data-host-action="accepted" data-request-id="${entry.id}">Yes, add</button>
+            <button class="no" type="button" data-host-action="rejected" data-request-id="${entry.id}">No, pass</button>
+            <button class="warn" type="button" data-host-action="refund_needed" data-request-id="${entry.id}">Needs refund</button>
             <a class="button secondary" href="${venmoPayUrl({
               recipient: venmo,
               amount,
               memo: refundMemo,
-            })}">Open Refund</a>
-            <button type="button" data-host-action="refunded" data-request-id="${entry.id}">Refunded</button>
-            <button type="button" data-host-action="done" data-request-id="${entry.id}">Done</button>
+            })}">Open refund</a>
+            <button class="secondary" type="button" data-host-action="refunded" data-request-id="${entry.id}">Sent refund</button>
+            <button class="secondary" type="button" data-host-action="done" data-request-id="${entry.id}">Sang it</button>
           </div>
         </article>
       `;
@@ -519,10 +563,10 @@ function renderHostQueue() {
 
 function statusLabel(status) {
   return {
-    pending_payment: "Pending payment",
+    pending_payment: "At the door",
     accepted: "In queue",
-    rejected: "Rejected",
-    refund_needed: "Refund needed",
+    rejected: "Passed",
+    refund_needed: "Needs refund",
     refunded: "Refunded",
     done: "Done",
     removed: "Removed",

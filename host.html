@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Host | Scaries</title>
-    <meta name="description" content="Scaries host queue controls." />
+    <title>Band Door | Scaries</title>
+    <meta name="description" content="Scaries band door for approving song requests." />
     <style>
       :root {
         color-scheme: dark;
@@ -16,6 +16,7 @@
         --gold: #f5bf4d;
         --green: #4ebf8d;
         --red: #d92832;
+        --blue: #69a7ff;
         --black: #0f0d10;
       }
 
@@ -53,6 +54,12 @@
         font-size: clamp(42px, 10vw, 76px);
         line-height: 0.9;
         letter-spacing: 0;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.45;
       }
 
       .panel,
@@ -101,6 +108,24 @@
         cursor: pointer;
       }
 
+      button:disabled {
+        opacity: 0.58;
+        cursor: wait;
+      }
+
+      .yes {
+        background: var(--green);
+      }
+
+      .no {
+        color: var(--ink);
+        background: var(--red);
+      }
+
+      .warn {
+        background: var(--blue);
+      }
+
       .secondary {
         color: var(--ink);
         background: rgba(248, 243, 234, 0.08);
@@ -113,7 +138,7 @@
       }
 
       .host-card strong {
-        font-size: 20px;
+        font-size: 22px;
       }
 
       .host-card span,
@@ -125,6 +150,37 @@
       .host-card > div {
         display: grid;
         gap: 4px;
+      }
+
+      .host-card.pending_payment {
+        border-color: rgba(245, 191, 77, 0.48);
+      }
+
+      .host-card.accepted {
+        border-color: rgba(78, 191, 141, 0.48);
+      }
+
+      .host-card.refund_needed {
+        border-color: rgba(105, 167, 255, 0.48);
+      }
+
+      .host-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .status-pill {
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 5px 9px;
+        color: var(--gold);
+        background: rgba(0, 0, 0, 0.22);
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
       }
 
       .host-meta {
@@ -139,9 +195,50 @@
         font-weight: 900;
       }
 
+      .door-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .door-stat {
+        display: grid;
+        gap: 3px;
+        min-height: 72px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .door-stat strong {
+        color: var(--ink);
+        font-size: 24px;
+      }
+
+      .door-stat span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .empty-door {
+        padding: 22px;
+        border: 1px dashed rgba(248, 243, 234, 0.24);
+        border-radius: 8px;
+        color: var(--muted);
+        text-align: center;
+      }
+
       @media (max-width: 640px) {
         form,
         .host-actions {
+          display: grid;
+        }
+
+        .host-topline,
+        .door-stats {
           display: grid;
         }
 
@@ -155,16 +252,18 @@
   <body data-page="host">
     <main>
       <a href="index.html">&larr; Links</a>
-      <h1>Host</h1>
+      <h1>Band Door</h1>
 
       <section class="panel">
         <form data-host-login>
-          <input data-host-code type="password" placeholder="Host code" autocomplete="current-password" />
-          <button type="submit">Unlock</button>
+          <input data-host-code type="password" placeholder="Band host code" autocomplete="current-password" />
+          <button type="submit">Open Door</button>
           <button class="secondary" type="button" data-host-refresh>Refresh</button>
         </form>
+        <p>Everyone in the band can use the same code. Leave this open to see requests land live.</p>
         <p data-backend-status>Connecting...</p>
-        <p data-host-status>Enter the host code to manage requests.</p>
+        <p data-host-status>Enter the host code to run the door.</p>
+        <div class="door-stats" data-host-stats hidden></div>
       </section>
 
       <section class="host-list" data-host-list></section>

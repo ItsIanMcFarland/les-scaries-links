@@ -44,19 +44,21 @@ Commit and push. GitHub Pages will switch from local demo mode to live synced qu
 - Public links page: `index.html`
 - Request page: `signup.html`
 - Public approved queue: `queue.html`
-- Host controls: `host.html`
+- Shared band door: `host.html`
 - Local song catalog: `songs.html`
 
-The request flow creates a unique Venmo memo and keeps the singer out of the public queue until a host marks the request `Paid / Add`.
+Everyone in the band can open `host.html` and use the same host code. With Supabase configured, every connected host device sees incoming requests in realtime.
 
-The host page can mark requests:
+The request flow creates a unique Venmo memo and keeps the singer out of the public queue until a host marks the request `Yes, add`.
 
-- `Paid / Add`: moves the singer into the public queue.
-- `Reject`: declines a pending request.
-- `Refund Needed`: flags a request the band cannot play.
-- `Open Refund`: opens Venmo with the singer handle, amount, and refund memo.
-- `Refunded`: clears the request after refunding.
-- `Done`: removes a completed singer from the public queue.
+The band door can mark requests:
+
+- `Yes, add`: moves the singer into the public queue.
+- `No, pass`: declines a pending request.
+- `Needs refund`: flags a request the band cannot play after payment.
+- `Open refund`: opens Venmo with the singer handle, amount, and refund memo.
+- `Sent refund`: clears the request after refunding.
+- `Sang it`: removes a completed singer from the public queue.
 
 ## Notes
 
