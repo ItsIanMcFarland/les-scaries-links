@@ -16,14 +16,14 @@ set value = 'YOUR-HOST-CODE'
 where key = 'host_code';
 ```
 
-If the project already exists, run `supabase-write-in-migration.sql` once in the SQL editor. This adds write-in requests, changes repertoire requests to $7, and makes write-ins $10.
+If the project already exists, run `supabase-write-in-migration.sql` once in the SQL editor. This adds write-in requests, changes repertoire requests to $7, and makes write-ins $10. If you already ran that older migration, run `supabase-require-write-in-artist.sql` once to make artist mandatory on write-ins.
 
 Requests must go through the `request_song` or `request_write_in` RPC. They validate:
 
 - Singer name must be 2-60 characters.
 - Venmo handle must look valid.
 - Repertoire songs must exist in `public.songs`.
-- Write-ins must include a song title.
+- Write-ins must include a song title and artist.
 - One open request per normalized singer name.
 - Two open requests max per browser/device.
 - 90-second cooldown per browser/device.

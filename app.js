@@ -414,10 +414,12 @@ function initRequestForm() {
     if (mode === "catalog") {
       searchInput.required = true;
       if (writeInTitleInput) writeInTitleInput.required = false;
+      if (writeInArtistInput) writeInArtistInput.required = false;
       searchInput.focus();
     } else {
       searchInput.required = false;
       if (writeInTitleInput) writeInTitleInput.required = true;
+      if (writeInArtistInput) writeInArtistInput.required = true;
       writeInTitleInput?.focus();
     }
     status.textContent = mode === "write_in" ? "Write-ins are $10 minimum and need host approval." : "";
@@ -526,6 +528,12 @@ function initRequestForm() {
       return;
     }
 
+    if (requestMode === "write_in" && writeIn.artist.length < 2) {
+      status.textContent = "Add the artist for the write-in.";
+      writeInArtistInput?.focus();
+      return;
+    }
+
     try {
       status.textContent = "Creating payment memo...";
       const request = await createRequest({
@@ -536,7 +544,7 @@ function initRequestForm() {
       });
       const requestedSong =
         requestMode === "write_in"
-          ? { title: writeIn.title, artist: writeIn.artist || "Write-in request", isWriteIn: true }
+          ? { title: writeIn.title, artist: writeIn.artist, isWriteIn: true }
           : song;
       form.reset();
       state.selectedSong = null;

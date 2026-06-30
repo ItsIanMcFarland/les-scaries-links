@@ -262,8 +262,8 @@ begin
     raise exception 'Add a song title between 2 and 120 characters.';
   end if;
 
-  if length(v_artist) > 120 then
-    raise exception 'Keep the artist name under 120 characters.';
+  if length(v_artist) < 2 or length(v_artist) > 120 then
+    raise exception 'Add an artist between 2 and 120 characters.';
   end if;
 
   select count(*) into v_open_by_singer
