@@ -8,6 +8,7 @@ const WRITE_IN_AMOUNT = "10";
 
 const state = {
   songs: [],
+  catalog: null,
   selectedSong: null,
   queue: readQueue(),
   backend: "local",
@@ -203,6 +204,34 @@ async function loadPublicQueue() {
   if (error) throw error;
   state.queue = data || [];
   renderQueue();
+}
+
+async function loadLiveSongs() {
+  if (state.backend !== "supabase") return;
+
+  const { data, error } = await state.supabase
+    .from("songs")
+    .select("id,title,artist,album,spotify_url,cover,sort")
+    .order("sort", { ascending: true });
+
+  if (error || !Array.isArray(data) || data.length <= state.songs.length) return;
+
+  state.songs = data.map((song) => ({
+    id: song.id,
+    uri: `spotify:track:${song.id}`,
+    title: song.title,
+    artist: song.artist,
+    album: song.album || "",
+    spotifyUrl: song.spotify_url || `https://open.spotify.com/track/${song.id}`,
+    cover: song.cover || "",
+    sort: song.sort || 0,
+  }));
+  state.catalog = {
+    ...(state.catalog || {}),
+    importedCount: state.songs.length,
+    totalAvailable: Math.max(state.catalog?.totalAvailable || 0, state.songs.length),
+    sourceName: state.catalog?.sourceName || "Live catalog",
+  };
 }
 
 async function loadHostQueue() {
@@ -897,7 +926,14 @@ function renderSongList() {
   if (!list) return;
 
   function draw(songs) {
-    if (count) count.textContent = `${songs.length} songs`;
+    if (count) {
+      const total = state.catalog?.totalAvailable || songs.length;
+      const isSearching = Boolean(search?.value.trim());
+      count.textContent =
+        !isSearching && total > songs.length
+          ? `${songs.length} imported songs / ${total} on Spotify`
+          : `${songs.length} ${songs.length === 1 ? "song" : "songs"}`;
+    }
     list.innerHTML = songs
       .map(
         (song) => `
@@ -933,8 +969,10 @@ function escapeHtml(value) {
 async function boot() {
   const response = await fetch(SONGS_URL);
   const catalog = await response.json();
+  state.catalog = catalog;
   state.songs = catalog.songs;
   await initBackend();
+  await loadLiveSongs();
 
   initRequestForm();
   initHost();

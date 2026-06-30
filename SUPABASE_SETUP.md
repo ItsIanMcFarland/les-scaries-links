@@ -73,3 +73,15 @@ The band door can mark requests:
 Venmo does not expose a simple public confirmation API for this use case. This flow is payment-assisted: it generates the memo, sends the singer to Venmo, and gives the host an approval dashboard. The host still verifies the payment manually in Venmo before adding the singer.
 
 This is anonymous browser-based validation. It prevents casual duplicate and back-to-back spam, but it cannot perfectly identify one human across multiple devices without authentication, check-in codes, or host approval.
+
+## Updating the Full Spotify Song List
+
+Spotify's public playlist page only exposes a preview of the first 30 tracks. To import the full playlist into the local app catalog and Supabase, use Spotify's official API:
+
+```bash
+SPOTIFY_CLIENT_ID="your-client-id" \
+SPOTIFY_CLIENT_SECRET="your-client-secret" \
+node tools/import-spotify-playlist.mjs
+```
+
+That command updates `songs.json` and writes `supabase-songs-upsert.sql`. Run the SQL file once in Supabase SQL Editor so the request form and host dashboard validate against the same full catalog.

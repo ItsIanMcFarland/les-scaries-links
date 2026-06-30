@@ -63,6 +63,12 @@
         backdrop-filter: blur(18px);
       }
 
+      .song-note {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
       input {
         width: 100%;
         min-height: 48px;
@@ -115,6 +121,20 @@
         color: var(--muted);
         font-size: 12px;
       }
+
+      .spotify-frame {
+        width: 100%;
+        min-height: 640px;
+        border: 0;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.32);
+      }
+
+      @media (max-width: 560px) {
+        .spotify-frame {
+          min-height: 520px;
+        }
+      }
     </style>
     <link rel="stylesheet" href="brand.css?v=cbgb-ska-1" />
   </head>
@@ -126,12 +146,26 @@
       <section class="panel">
         <input data-catalog-search autocomplete="off" placeholder="Search by artist or song" />
         <span class="count" data-song-count>0 songs</span>
+        <p class="song-note">
+          Search uses the imported request catalog. The full Spotify playlist is embedded below while we sync the rest of the repertoire into the app.
+        </p>
         <div class="catalog" data-song-list></div>
+      </section>
+
+      <section class="panel">
+        <h2>Full Spotify Repertoire</h2>
+        <iframe
+          class="spotify-frame"
+          title="Sunday Scaries Spotify playlist"
+          src="https://open.spotify.com/embed/playlist/4KyUr7vipHnMKR1Wc5ZtrO?utm_source=generator&theme=0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        ></iframe>
       </section>
     </main>
 
-    <script src="supabase-config.js?v=write-in-1"></script>
+    <script src="supabase-config.js?v=song-catalog-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=write-in-1"></script>
+    <script src="app.js?v=song-catalog-1"></script>
   </body>
 </html>
