@@ -221,7 +221,7 @@
       <section class="panel">
         <div>
           <h1>Request</h1>
-          <p>Pick your song, add your Venmo handle, then pay with the generated memo.</p>
+          <p>Search the repertoire by artist or song, add your Venmo handle, then pay with the generated memo.</p>
           <p class="status" data-backend-status>Connecting...</p>
         </div>
 
@@ -237,8 +237,8 @@
           </label>
 
           <label>
-            Song
-            <input data-song-search autocomplete="off" placeholder="Search by song or artist" required />
+            Artist or song
+            <input data-song-search autocomplete="off" placeholder="Try Chappell Roan or Mr. Brightside" required />
             <span class="selected-song" data-selected-song hidden></span>
             <div class="search-results" data-search-results hidden></div>
           </label>
@@ -251,8 +251,8 @@
       <section class="panel" data-payment-panel hidden></section>
     </main>
 
-    <script src="supabase-config.js"></script>
+    <script src="supabase-config.js?v=repertoire-search-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=repertoire-search-1"></script>
   </body>
 </html>

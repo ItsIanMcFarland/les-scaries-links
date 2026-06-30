@@ -51,13 +51,19 @@ function compactKey(value) {
 }
 
 function scoreSong(song, query) {
-  const haystack = normalize(`${song.title} ${song.artist} ${song.album}`);
+  const title = normalize(song.title);
+  const artist = normalize(song.artist);
+  const album = normalize(song.album);
+  const haystack = `${title} ${artist} ${album}`;
   const needle = normalize(query);
 
   if (!needle) return 0;
   if (haystack === needle) return 100;
-  if (haystack.startsWith(needle)) return 90;
-  if (normalize(song.title).startsWith(needle)) return 86;
+  if (title === needle) return 98;
+  if (artist === needle) return 96;
+  if (title.startsWith(needle)) return 90;
+  if (artist.startsWith(needle)) return 88;
+  if (haystack.startsWith(needle)) return 84;
   if (haystack.includes(needle)) return 72;
 
   const terms = needle.split(" ").filter(Boolean);
