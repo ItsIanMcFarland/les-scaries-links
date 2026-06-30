@@ -1,15 +1,17 @@
 :root {
-  --ink: #fff8ea;
-  --muted: #c8b9a8;
+  --ink: #fff4df;
+  --paper: #f4ead5;
+  --muted: #d0bda3;
   --line: rgba(255, 248, 234, 0.22);
-  --panel: rgba(9, 8, 8, 0.86);
+  --panel: rgba(8, 7, 7, 0.88);
   --field: rgba(255, 248, 234, 0.075);
-  --red: #e21d2f;
-  --gold: #f2c14d;
-  --green: #55d092;
-  --violet: #6b5dff;
-  --blue: #5fa7ff;
-  --black: #070606;
+  --red: #e11f2d;
+  --gold: #f4bd43;
+  --green: #36b889;
+  --violet: #7758ee;
+  --blue: #4ea3e6;
+  --black: #050404;
+  --checker: repeating-conic-gradient(#f5ead4 0 25%, #050404 0 50%) 0 0 / 18px 18px;
 }
 
 * {
@@ -23,9 +25,10 @@
 body {
   color: var(--ink);
   background:
-    linear-gradient(90deg, rgba(226, 29, 47, 0.22), transparent 18%, transparent 82%, rgba(242, 193, 77, 0.10)),
-    linear-gradient(180deg, rgba(4, 3, 3, 0.5), rgba(4, 3, 3, 0.96)),
-    url("assets/les-scaries-stage.png") center / cover fixed,
+    radial-gradient(circle at 50% 21%, rgba(244, 189, 67, 0.24), transparent 19rem),
+    linear-gradient(90deg, rgba(225, 31, 45, 0.26), transparent 18%, transparent 78%, rgba(54, 184, 137, 0.14)),
+    linear-gradient(180deg, rgba(5, 4, 4, 0.28), rgba(5, 4, 4, 0.94)),
+    url("assets/scaries-club-stage.webp") center / cover fixed,
     #070606;
 }
 
@@ -35,24 +38,25 @@ body::before {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.66;
   background-image:
-    linear-gradient(90deg, rgba(255, 248, 234, 0.05) 1px, transparent 1px),
-    repeating-linear-gradient(0deg, rgba(255, 248, 234, 0.045) 0 1px, transparent 1px 7px),
+    linear-gradient(90deg, rgba(255, 244, 223, 0.045) 1px, transparent 1px),
+    repeating-linear-gradient(0deg, rgba(255, 244, 223, 0.05) 0 1px, transparent 1px 7px),
+    radial-gradient(circle at 11% 19%, rgba(225, 31, 45, 0.18), transparent 8rem),
     linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.7));
-  background-size: 72px 72px, 100% 9px, 100% 100%;
+  background-size: 72px 72px, 100% 9px, 100% 100%, 100% 100%;
   mix-blend-mode: screen;
 }
 
 body::after {
-  content: "SCARIES   LOWER EAST SIDE   LIVE BAND KARAOKE";
+  content: "LIVE BAND KARAOKE  /  LOWER EAST SIDE  /  SCARIES";
   position: fixed;
   left: -4vw;
   right: -4vw;
   bottom: 2.1vh;
   z-index: 0;
   pointer-events: none;
-  color: rgba(255, 248, 234, 0.055);
+  color: rgba(255, 244, 223, 0.07);
   font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
   font-size: clamp(38px, 8vw, 112px);
   line-height: 0.82;
@@ -71,7 +75,10 @@ h1,
 h2,
 h3 {
   color: var(--ink);
-  text-shadow: 0 3px 0 #000, 0 12px 34px rgba(0, 0, 0, 0.62);
+  text-shadow:
+    0 3px 0 #000,
+    2px 5px 0 rgba(225, 31, 45, 0.46),
+    0 16px 34px rgba(0, 0, 0, 0.72);
 }
 
 h1 {
@@ -116,14 +123,29 @@ button,
 .host-card,
 .member {
   position: relative;
-  border-color: rgba(255, 248, 234, 0.24);
+  border-color: rgba(255, 244, 223, 0.28);
   background:
-    linear-gradient(90deg, rgba(226, 29, 47, 0.12), transparent 9px),
-    linear-gradient(180deg, rgba(255, 248, 234, 0.035), rgba(0, 0, 0, 0.18)),
+    linear-gradient(90deg, rgba(225, 31, 45, 0.16), transparent 12px),
+    linear-gradient(180deg, rgba(255, 244, 223, 0.045), rgba(0, 0, 0, 0.22)),
     var(--panel);
   box-shadow:
     0 18px 44px rgba(0, 0, 0, 0.48),
-    inset 0 1px 0 rgba(255, 248, 234, 0.06);
+    inset 0 1px 0 rgba(255, 244, 223, 0.08);
+}
+
+.panel::after,
+.section::after,
+.link::after,
+.host-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: var(--checker);
+  opacity: 0.76;
+  pointer-events: none;
 }
 
 .panel::before,
@@ -146,11 +168,29 @@ button,
     background 160ms ease;
 }
 
+.link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 5px;
+  width: 3px;
+  background: var(--red);
+}
+
+.link:nth-child(2n)::before {
+  background: var(--gold);
+}
+
+.link:nth-child(3n)::before {
+  background: var(--green);
+}
+
 .link:hover,
 .link:focus-visible {
-  border-color: rgba(255, 248, 234, 0.55);
+  border-color: rgba(255, 244, 223, 0.62);
   background:
-    linear-gradient(90deg, rgba(226, 29, 47, 0.20), transparent 14px),
+    linear-gradient(90deg, rgba(225, 31, 45, 0.24), transparent 14px),
     rgba(10, 9, 9, 0.94);
   transform: translateY(-1px);
   outline: none;
@@ -183,14 +223,31 @@ label,
     inset 0 0 0 1px rgba(255, 248, 234, 0.18);
 }
 
+.icon {
+  background-image:
+    linear-gradient(135deg, rgba(255, 244, 223, 0.20), transparent 42%),
+    var(--checker);
+  color: #080606;
+}
+
 .mark {
+  position: relative;
   border: 2px solid var(--ink);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 50%, #e21d2f 0 31%, #050404 32% 100%);
+    radial-gradient(circle at 50% 50%, #e11f2d 0 29%, #050404 30% 51%, #f4ead5 52% 57%, #050404 58% 100%);
   box-shadow:
     7px 7px 0 #000,
     0 0 0 5px rgba(255, 248, 234, 0.08);
+}
+
+.mark::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 244, 223, 0.54);
+  pointer-events: none;
 }
 
 .mark text {
@@ -203,6 +260,15 @@ button,
   border-radius: 3px;
   box-shadow: 4px 4px 0 #000;
   text-transform: uppercase;
+}
+
+button:hover,
+.button:hover,
+button:focus-visible,
+.button:focus-visible {
+  filter: contrast(1.08) saturate(1.08);
+  outline: 2px solid rgba(255, 244, 223, 0.28);
+  outline-offset: 3px;
 }
 
 button:active,
@@ -233,7 +299,7 @@ input:focus {
 .door-stat,
 .payment-code {
   background:
-    linear-gradient(90deg, rgba(255, 248, 234, 0.035), transparent),
+    linear-gradient(90deg, rgba(255, 244, 223, 0.045), transparent),
     rgba(0, 0, 0, 0.36);
 }
 
@@ -262,8 +328,31 @@ input:focus {
   background: var(--blue);
 }
 
+.violet {
+  background:
+    linear-gradient(135deg, rgba(5, 4, 4, 0.12), transparent),
+    var(--violet);
+}
+
+.cream {
+  background: var(--paper);
+}
+
 .black {
   background: #050404;
+}
+
+.write-in-result {
+  background:
+    linear-gradient(90deg, rgba(244, 189, 67, 0.16), transparent),
+    rgba(0, 0, 0, 0.56);
+}
+
+.selected-song {
+  border-color: rgba(54, 184, 137, 0.72);
+  background:
+    linear-gradient(90deg, rgba(54, 184, 137, 0.18), transparent),
+    rgba(0, 0, 0, 0.38);
 }
 
 footer {
@@ -275,14 +364,22 @@ footer {
 @media (max-width: 640px) {
   body {
     background:
-      linear-gradient(90deg, rgba(226, 29, 47, 0.18), transparent 34%),
+      radial-gradient(circle at 50% 16%, rgba(244, 189, 67, 0.20), transparent 13rem),
+      linear-gradient(90deg, rgba(225, 31, 45, 0.18), transparent 34%),
       linear-gradient(180deg, rgba(4, 3, 3, 0.38), rgba(4, 3, 3, 0.96)),
-      url("assets/les-scaries-stage.png") 50% 0 / auto 100vh no-repeat fixed,
+      url("assets/scaries-club-stage.webp") 50% 0 / auto 100vh no-repeat fixed,
       #070606;
   }
 
   body::after {
     bottom: 0.8vh;
     font-size: 44px;
+  }
+
+  .panel::after,
+  .section::after,
+  .link::after,
+  .host-card::after {
+    height: 4px;
   }
 }
