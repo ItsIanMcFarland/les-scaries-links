@@ -3,7 +3,8 @@ const QUEUE_KEY = "scaries.queueDemo.v2";
 const DEVICE_KEY = "scaries.deviceId.v1";
 const HOST_KEY = "scaries.hostCode.v1";
 const VENMO_HANDLE = "itsianmcfarland";
-const REQUEST_AMOUNT = "5";
+const REQUEST_AMOUNT = "7";
+const WRITE_IN_AMOUNT = "10";
 
 const state = {
   songs: [],
@@ -92,6 +93,23 @@ function getEntrySongId(entry) {
   return entry.song_id || entry.songId;
 }
 
+function getEntryType(entry) {
+  return entry.request_type || entry.requestType || (entry.write_in_title || entry.writeInTitle ? "write_in" : "catalog");
+}
+
+function getEntrySong(entry) {
+  if (getEntryType(entry) === "write_in") {
+    return {
+      id: "write-in",
+      title: entry.write_in_title || entry.writeInTitle || "Write-in request",
+      artist: entry.write_in_artist || entry.writeInArtist || "Host approval needed",
+      isWriteIn: true,
+    };
+  }
+
+  return getSong(getEntrySongId(entry));
+}
+
 function getEntryTime(entry) {
   return entry.created_at || entry.requestedAt || "";
 }
@@ -164,12 +182,23 @@ async function loadPublicQueue() {
     return;
   }
 
-  const { data, error } = await state.supabase
+  let { data, error } = await state.supabase
     .from("queue_requests")
-    .select("id,singer,song_id,status,created_at")
+    .select("id,singer,song_id,request_type,write_in_title,write_in_artist,status,created_at")
     .eq("status", "accepted")
     .order("accepted_at", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true });
+
+  if (error && /request_type|write_in/i.test(error.message || "")) {
+    const fallback = await state.supabase
+      .from("queue_requests")
+      .select("id,singer,song_id,status,created_at")
+      .eq("status", "accepted")
+      .order("accepted_at", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: true });
+    data = fallback.data;
+    error = fallback.error;
+  }
 
   if (error) throw error;
   state.queue = data || [];
@@ -208,7 +237,8 @@ async function loadHostQueue() {
   renderHostQueue();
 }
 
-async function createRequest({ singer, venmoHandle, song }) {
+async function createRequest({ singer, venmoHandle, song, writeIn }) {
+  const isWriteIn = Boolean(writeIn);
   if (state.backend !== "supabase") {
     const queue = readQueue();
     const activeBySinger = queue.filter(
@@ -230,10 +260,13 @@ async function createRequest({ singer, venmoHandle, song }) {
       singer,
       singerKey: compactKey(singer),
       venmoHandle,
-      songId: song.id,
+      songId: isWriteIn ? null : song.id,
+      requestType: isWriteIn ? "write_in" : "catalog",
+      writeInTitle: isWriteIn ? writeIn.title : "",
+      writeInArtist: isWriteIn ? writeIn.artist : "",
       status: "pending_payment",
       venmoMemo: makeMemo(),
-      paymentAmount: REQUEST_AMOUNT,
+      paymentAmount: isWriteIn ? WRITE_IN_AMOUNT : REQUEST_AMOUNT,
       deviceId: state.deviceId,
       requestedAt: new Date().toISOString(),
     };
@@ -243,14 +276,27 @@ async function createRequest({ singer, venmoHandle, song }) {
     return request;
   }
 
-  const { data, error } = await state.supabase.rpc("request_song", {
-    p_singer: singer,
-    p_song_id: song.id,
-    p_device_id: state.deviceId,
-    p_venmo_handle: venmoHandle,
-  });
+  const { data, error } = isWriteIn
+    ? await state.supabase.rpc("request_write_in", {
+        p_singer: singer,
+        p_title: writeIn.title,
+        p_artist: writeIn.artist,
+        p_device_id: state.deviceId,
+        p_venmo_handle: venmoHandle,
+      })
+    : await state.supabase.rpc("request_song", {
+        p_singer: singer,
+        p_song_id: song.id,
+        p_device_id: state.deviceId,
+        p_venmo_handle: venmoHandle,
+      });
 
-  if (error) throw error;
+  if (error) {
+    if (/request_write_in/i.test(error.message || "")) {
+      throw new Error("Write-ins need the Supabase migration first.");
+    }
+    throw error;
+  }
   return data;
 }
 
@@ -313,8 +359,40 @@ function initRequestForm() {
   const selected = document.querySelector("[data-selected-song]");
   const status = document.querySelector("[data-form-status]");
   const payment = document.querySelector("[data-payment-panel]");
+  const catalogFields = document.querySelector("[data-catalog-fields]");
+  const writeInFields = document.querySelector("[data-write-in-fields]");
+  const writeInTitleInput = document.querySelector("[data-write-in-title]");
+  const writeInArtistInput = document.querySelector("[data-write-in-artist]");
+  const modeButtons = document.querySelectorAll("[data-request-mode]");
+
+  let requestMode = "catalog";
 
   if (!form || !searchInput || !results) return;
+
+  function setRequestMode(mode) {
+    requestMode = mode;
+    state.selectedSong = null;
+    selected.hidden = true;
+    results.hidden = true;
+    results.innerHTML = "";
+    modeButtons.forEach((button) => {
+      const active = button.dataset.requestMode === mode;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    if (catalogFields) catalogFields.hidden = mode !== "catalog";
+    if (writeInFields) writeInFields.hidden = mode !== "write_in";
+    if (mode === "catalog") {
+      searchInput.required = true;
+      if (writeInTitleInput) writeInTitleInput.required = false;
+      searchInput.focus();
+    } else {
+      searchInput.required = false;
+      if (writeInTitleInput) writeInTitleInput.required = true;
+      writeInTitleInput?.focus();
+    }
+    status.textContent = mode === "write_in" ? "Write-ins are $10 minimum and need host approval." : "";
+  }
 
   function setSelected(song) {
     state.selectedSong = song;
@@ -340,6 +418,14 @@ function initRequestForm() {
     }
 
     const matches = searchSongs(query);
+    const writeInButton = `
+      <button type="button" class="song-result write-in-result" data-write-in-from-search="${escapeHtml(query.trim())}">
+        <span>
+          <strong>Write in "${escapeHtml(query.trim())}"</strong>
+          <small>$${WRITE_IN_AMOUNT} minimum, host approval needed</small>
+        </span>
+      </button>
+    `;
     results.innerHTML = matches
       .map(
         (song) => `
@@ -352,13 +438,25 @@ function initRequestForm() {
           </button>
         `,
       )
-      .join("");
-    results.hidden = matches.length === 0;
+      .join("") + writeInButton;
+    results.hidden = false;
   }
 
   searchInput.addEventListener("input", renderResults);
 
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => setRequestMode(button.dataset.requestMode));
+  });
+
   results.addEventListener("click", (event) => {
+    const writeInButton = event.target.closest("[data-write-in-from-search]");
+    if (writeInButton) {
+      const query = writeInButton.dataset.writeInFromSearch || "";
+      setRequestMode("write_in");
+      if (writeInTitleInput) writeInTitleInput.value = query;
+      return;
+    }
+
     const button = event.target.closest("[data-song-id]");
     if (!button) return;
     const song = getSong(button.dataset.songId);
@@ -370,6 +468,10 @@ function initRequestForm() {
     const singer = singerInput.value.trim();
     const venmoHandle = venmoInput.value.trim().replace(/^@/, "");
     const song = state.selectedSong;
+    const writeIn = {
+      title: writeInTitleInput?.value.trim() || "",
+      artist: writeInArtistInput?.value.trim() || "",
+    };
 
     if (!singer) {
       status.textContent = "Add your name first.";
@@ -383,25 +485,43 @@ function initRequestForm() {
       return;
     }
 
-    if (!song) {
+    if (requestMode === "catalog" && !song) {
       status.textContent = "Choose a song from the search results.";
       searchInput.focus();
       return;
     }
 
+    if (requestMode === "write_in" && writeIn.title.length < 2) {
+      status.textContent = "Add the song title for the write-in.";
+      writeInTitleInput?.focus();
+      return;
+    }
+
     try {
       status.textContent = "Creating payment memo...";
-      const request = await createRequest({ singer, venmoHandle, song });
+      const request = await createRequest({
+        singer,
+        venmoHandle,
+        song,
+        writeIn: requestMode === "write_in" ? writeIn : null,
+      });
+      const requestedSong =
+        requestMode === "write_in"
+          ? { title: writeIn.title, artist: writeIn.artist || "Write-in request", isWriteIn: true }
+          : song;
       form.reset();
       state.selectedSong = null;
       selected.hidden = true;
       results.hidden = true;
       status.textContent = "Request created. Venmo with the memo below.";
-      renderPaymentPanel(payment, request, song);
+      setRequestMode("catalog");
+      renderPaymentPanel(payment, request, requestedSong);
     } catch (error) {
       status.textContent = error.message || "Could not create that request.";
     }
   });
+
+  setRequestMode("catalog");
 }
 
 document.addEventListener("click", async (event) => {
@@ -438,7 +558,7 @@ function renderPaymentPanel(panel, request, song) {
       <span>Amount</span>
       <strong>$${escapeHtml(amount)}</strong>
     </div>
-    <p>${escapeHtml(song.title)} - ${escapeHtml(song.artist)}</p>
+    <p>${escapeHtml(song.title)} - ${escapeHtml(song.artist)}${song.isWriteIn ? " (write-in)" : ""}</p>
     <p>${escapeHtml(note)}</p>
     <div class="actions">
       <a class="button" href="${venmoAudienceWebUrl()}" target="_blank" rel="noreferrer">Open Venmo Profile</a>
@@ -462,14 +582,14 @@ function renderQueue() {
   empty.hidden = state.queue.length > 0;
   list.innerHTML = state.queue
     .map((entry, index) => {
-      const song = getSong(getEntrySongId(entry));
+      const song = getEntrySong(entry);
       return `
         <li class="queue-item">
           <span class="queue-number">${index + 1}</span>
           <span class="queue-copy">
             <strong>${escapeHtml(entry.singer)}</strong>
             <span>${song ? escapeHtml(song.title) : "Unknown song"}</span>
-            <small>${song ? `${escapeHtml(song.artist)} - ${escapeHtml(song.id)}` : escapeHtml(getEntrySongId(entry))}</small>
+            <small>${song ? `${escapeHtml(song.artist)}${song.isWriteIn ? " - write-in" : ` - ${escapeHtml(song.id)}`}` : escapeHtml(getEntrySongId(entry))}</small>
           </span>
           <span class="queue-time">${formatQueueTime(getEntryTime(entry))}</span>
         </li>
@@ -678,7 +798,7 @@ function renderHostQueue() {
 }
 
 function renderHostCard(entry) {
-  const song = getSong(getEntrySongId(entry));
+  const song = getEntrySong(entry);
   const memo = entry.venmo_memo || entry.venmoMemo || "";
   const venmo = entry.venmo_handle || entry.venmoHandle || "";
   const amount = String(entry.payment_amount || entry.paymentAmount || REQUEST_AMOUNT);
@@ -693,7 +813,7 @@ function renderHostCard(entry) {
       </div>
       <div>
         <span>${song ? escapeHtml(song.title) : "Unknown song"}</span>
-        <small>${song ? escapeHtml(song.artist) : escapeHtml(getEntrySongId(entry))}</small>
+        <small>${song ? `${escapeHtml(song.artist)}${song.isWriteIn ? " - write-in" : ""}` : escapeHtml(getEntrySongId(entry))}</small>
       </div>
       <div class="host-meta">
         <code>${escapeHtml(memo)}</code>

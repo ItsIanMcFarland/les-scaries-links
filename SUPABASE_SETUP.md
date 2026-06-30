@@ -16,11 +16,14 @@ set value = 'YOUR-HOST-CODE'
 where key = 'host_code';
 ```
 
-Requests must go through the `request_song` RPC. It validates:
+If the project already exists, run `supabase-write-in-migration.sql` once in the SQL editor. This adds write-in requests, changes repertoire requests to $7, and makes write-ins $10.
+
+Requests must go through the `request_song` or `request_write_in` RPC. They validate:
 
 - Singer name must be 2-60 characters.
 - Venmo handle must look valid.
-- Song must exist in `public.songs`.
+- Repertoire songs must exist in `public.songs`.
+- Write-ins must include a song title.
 - One open request per normalized singer name.
 - Two open requests max per browser/device.
 - 90-second cooldown per browser/device.
@@ -50,6 +53,11 @@ Commit and push. GitHub Pages will switch from local demo mode to live synced qu
 Everyone in the band can open `host.html` and use the same host code. With Supabase configured, every connected host device sees incoming requests in realtime.
 
 The request flow creates a unique Venmo memo and keeps the singer out of the public queue until a host marks the request `Yes, add`.
+
+Current minimums:
+
+- Repertoire request: $7
+- Write-in request: $10
 
 The band door can mark requests:
 

@@ -149,6 +149,12 @@
         text-align: left;
       }
 
+      .write-in-result {
+        grid-template-columns: 1fr;
+        border-color: rgba(245, 191, 77, 0.48);
+        background: rgba(245, 191, 77, 0.12);
+      }
+
       .song-result img {
         width: 42px;
         aspect-ratio: 1;
@@ -172,6 +178,32 @@
         border: 1px solid rgba(78, 191, 141, 0.5);
         border-radius: 8px;
         background: rgba(78, 191, 141, 0.1);
+      }
+
+      .request-modes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .mode-button {
+        min-height: 44px;
+        color: var(--ink);
+        background: rgba(248, 243, 234, 0.08);
+      }
+
+      .mode-button.active {
+        color: #130f10;
+        background: var(--gold);
+      }
+
+      .field-group {
+        display: grid;
+        gap: 12px;
+      }
+
+      [hidden] {
+        display: none !important;
       }
 
       .status {
@@ -237,12 +269,36 @@
             <input data-venmo-handle autocomplete="off" placeholder="@yourhandle" required />
           </label>
 
-          <label>
-            Artist or song
-            <input data-song-search autocomplete="off" placeholder="Try Chappell Roan or Mr. Brightside" required />
-            <span class="selected-song" data-selected-song hidden></span>
-            <div class="search-results" data-search-results hidden></div>
-          </label>
+          <div class="request-modes" role="group" aria-label="Request type">
+            <button class="mode-button active" type="button" data-request-mode="catalog" aria-pressed="true">
+              Repertoire $7
+            </button>
+            <button class="mode-button" type="button" data-request-mode="write_in" aria-pressed="false">
+              Write-in $10
+            </button>
+          </div>
+
+          <div class="field-group" data-catalog-fields>
+            <label>
+              Artist or song
+              <input data-song-search autocomplete="off" placeholder="Try Chappell Roan or Mr. Brightside" required />
+              <span class="selected-song" data-selected-song hidden></span>
+              <div class="search-results" data-search-results hidden></div>
+            </label>
+            <small>Repertoire requests are $7 minimum.</small>
+          </div>
+
+          <div class="field-group" data-write-in-fields hidden>
+            <label>
+              Song title
+              <input data-write-in-title autocomplete="off" placeholder="Song you want to sing" />
+            </label>
+            <label>
+              Artist
+              <input data-write-in-artist autocomplete="off" placeholder="Optional, but helpful" />
+            </label>
+            <small>Write-ins are $10 minimum and the host can approve, pass, or refund.</small>
+          </div>
 
           <button type="submit">Create Venmo Memo</button>
           <p class="status" data-form-status aria-live="polite"></p>
@@ -252,8 +308,8 @@
       <section class="panel" data-payment-panel hidden></section>
     </main>
 
-    <script src="supabase-config.js?v=queue-fix-1"></script>
+    <script src="supabase-config.js?v=write-in-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=queue-fix-1"></script>
+    <script src="app.js?v=write-in-1"></script>
   </body>
 </html>
