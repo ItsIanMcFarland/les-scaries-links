@@ -48,12 +48,27 @@
         text-decoration: none;
       }
 
-      h1 {
+      h1,
+      h2,
+      h3 {
         margin: 18px 0;
         font-family: Georgia, "Times New Roman", serif;
-        font-size: clamp(42px, 10vw, 76px);
         line-height: 0.9;
         letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: clamp(42px, 10vw, 76px);
+      }
+
+      h2 {
+        margin: 0;
+        font-size: clamp(30px, 6vw, 48px);
+      }
+
+      h3 {
+        margin: 0;
+        font-size: clamp(24px, 5vw, 36px);
       }
 
       p {
@@ -74,7 +89,8 @@
       }
 
       form,
-      .host-actions {
+      .host-actions,
+      .door-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
@@ -133,8 +149,30 @@
 
       .host-list {
         display: grid;
-        gap: 12px;
+        gap: 16px;
         margin-top: 14px;
+      }
+
+      .door-dashboard {
+        margin-top: 14px;
+      }
+
+      .door-toolbar,
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: end;
+      }
+
+      .door-section {
+        display: grid;
+        gap: 10px;
+      }
+
+      .door-section-list {
+        display: grid;
+        gap: 12px;
       }
 
       .host-card strong {
@@ -233,12 +271,15 @@
 
       @media (max-width: 640px) {
         form,
-        .host-actions {
+        .host-actions,
+        .door-actions {
           display: grid;
         }
 
         .host-topline,
-        .door-stats {
+        .door-stats,
+        .door-toolbar,
+        .section-head {
           display: grid;
         }
 
@@ -254,19 +295,31 @@
       <a href="index.html">&larr; Links</a>
       <h1>Band Door</h1>
 
-      <section class="panel">
+      <section class="panel" data-host-gate>
         <form data-host-login>
           <input data-host-code type="password" placeholder="Band host code" autocomplete="current-password" />
           <button type="submit">Open Door</button>
-          <button class="secondary" type="button" data-host-refresh>Refresh</button>
         </form>
         <p>Everyone in the band can use the same code. Leave this open to see requests land live.</p>
         <p data-backend-status>Connecting...</p>
         <p data-host-status>Enter the host code to run the door.</p>
+      </section>
+
+      <section class="panel door-dashboard" data-host-dashboard hidden>
+        <div class="door-toolbar">
+          <div>
+            <h2>Requests</h2>
+            <p data-host-dashboard-status>Opening the door...</p>
+          </div>
+          <div class="door-actions">
+            <button class="secondary" type="button" data-host-refresh>Refresh</button>
+            <a class="button secondary" href="host.html">Lock Door</a>
+          </div>
+        </div>
         <div class="door-stats" data-host-stats hidden></div>
       </section>
 
-      <section class="host-list" data-host-list></section>
+      <section class="host-list" data-host-list hidden></section>
     </main>
 
     <script src="supabase-config.js"></script>

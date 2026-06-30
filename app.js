@@ -90,6 +90,14 @@ function getEntryTime(entry) {
   return entry.created_at || entry.requestedAt || "";
 }
 
+function isHostPage() {
+  return document.body.dataset.page === "host";
+}
+
+function isDoorOpenRoute() {
+  return new URLSearchParams(window.location.search).get("door") === "open";
+}
+
 function isSupabaseConfigured() {
   const config = window.SCARIES_SUPABASE;
   return Boolean(config?.url && config?.anonKey && window.supabase?.createClient);
@@ -136,7 +144,7 @@ function setBackendStatus(message) {
 }
 
 async function refreshData() {
-  if (document.body.dataset.page === "host") {
+  if (isHostPage()) {
     await loadHostQueue();
   } else {
     await loadPublicQueue();
@@ -163,6 +171,11 @@ async function loadPublicQueue() {
 }
 
 async function loadHostQueue() {
+  if (!isDoorOpenRoute()) {
+    renderHostLocked();
+    return;
+  }
+
   if (state.backend !== "supabase") {
     state.queue = readQueue().filter((entry) =>
       ["pending_payment", "accepted", "refund_needed"].includes(entry.status),
@@ -440,15 +453,28 @@ function initHost() {
   const form = document.querySelector("[data-host-login]");
   const input = document.querySelector("[data-host-code]");
   const refresh = document.querySelector("[data-host-refresh]");
+  const gate = document.querySelector("[data-host-gate]");
+  const dashboard = document.querySelector("[data-host-dashboard]");
+  const list = document.querySelector("[data-host-list]");
 
   if (!form) return;
+
+  if (isDoorOpenRoute()) {
+    if (gate) gate.hidden = true;
+    if (dashboard) dashboard.hidden = false;
+    if (list) list.hidden = false;
+  } else {
+    if (gate) gate.hidden = false;
+    if (dashboard) dashboard.hidden = true;
+    if (list) list.hidden = true;
+  }
 
   input.value = state.hostCode;
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     state.hostCode = input.value.trim();
     localStorage.setItem(HOST_KEY, state.hostCode);
-    await loadHostQueue();
+    window.location.href = `${window.location.pathname}?door=open`;
   });
 
   refresh?.addEventListener("click", () => loadHostQueue());
@@ -457,9 +483,18 @@ function initHost() {
 function renderHostLocked(message = "Enter the host code to run the door.") {
   const list = document.querySelector("[data-host-list]");
   const status = document.querySelector("[data-host-status]");
+  const dashboardStatus = document.querySelector("[data-host-dashboard-status]");
   const stats = document.querySelector("[data-host-stats]");
+  const gate = document.querySelector("[data-host-gate]");
+  const dashboard = document.querySelector("[data-host-dashboard]");
   if (status) status.textContent = message;
+  if (dashboardStatus) dashboardStatus.textContent = message;
   if (list) list.innerHTML = "";
+  if (!isDoorOpenRoute()) {
+    if (gate) gate.hidden = false;
+    if (dashboard) dashboard.hidden = true;
+    if (list) list.hidden = true;
+  }
   if (stats) {
     stats.hidden = true;
     stats.innerHTML = "";
@@ -469,8 +504,15 @@ function renderHostLocked(message = "Enter the host code to run the door.") {
 function renderHostQueue() {
   const list = document.querySelector("[data-host-list]");
   const status = document.querySelector("[data-host-status]");
+  const dashboardStatus = document.querySelector("[data-host-dashboard-status]");
   const stats = document.querySelector("[data-host-stats]");
+  const gate = document.querySelector("[data-host-gate]");
+  const dashboard = document.querySelector("[data-host-dashboard]");
   if (!list) return;
+
+  if (gate) gate.hidden = true;
+  if (dashboard) dashboard.hidden = false;
+  list.hidden = false;
 
   const counts = {
     pending: state.queue.filter((entry) => entry.status === "pending_payment").length,
@@ -480,6 +522,12 @@ function renderHostQueue() {
 
   if (status) {
     status.textContent =
+      state.backend === "supabase"
+        ? "Live door is open."
+        : "Local demo door is open.";
+  }
+  if (dashboardStatus) {
+    dashboardStatus.textContent =
       state.backend === "supabase"
         ? "Live door is open."
         : "Local demo door is open.";
@@ -504,48 +552,83 @@ function renderHostQueue() {
   }
 
   if (state.queue.length === 0) {
-    list.innerHTML = `<p class="empty-door">No requests at the door right now.</p>`;
+    list.innerHTML = `
+      <section class="door-section">
+        <div class="section-head">
+          <div>
+            <h3>Requests Pending</h3>
+            <p>New singers waiting for a yes or no.</p>
+          </div>
+        </div>
+        <p class="empty-door">No requests pending right now.</p>
+      </section>
+      <section class="door-section">
+        <div class="section-head">
+          <div>
+            <h3>Requests In Queue</h3>
+            <p>Approved singers ready to be called up.</p>
+          </div>
+        </div>
+        <p class="empty-door">No singers in the queue yet.</p>
+      </section>
+    `;
     return;
   }
 
-  list.innerHTML = state.queue
-    .map((entry) => {
-      const song = getSong(getEntrySongId(entry));
-      const memo = entry.venmo_memo || entry.venmoMemo || "";
-      const venmo = entry.venmo_handle || entry.venmoHandle || "";
-      const amount = String(entry.payment_amount || entry.paymentAmount || REQUEST_AMOUNT);
-      const refundMemo = `Refund ${memo} - ${song ? song.title : "Scaries request"}`;
-      return `
-        <article class="host-card ${escapeHtml(entry.status)}">
-          <div class="host-topline">
-            <strong>${escapeHtml(entry.singer || "Unknown singer")}</strong>
-            <span class="status-pill">${escapeHtml(statusLabel(entry.status))}</span>
-          </div>
-          <div>
-            <span>${song ? escapeHtml(song.title) : "Unknown song"}</span>
-            <small>${song ? escapeHtml(song.artist) : escapeHtml(getEntrySongId(entry))}</small>
-          </div>
-          <div class="host-meta">
-            <code>${escapeHtml(memo)}</code>
-            <span>$${escapeHtml(amount)}</span>
-            <a href="${venmoWebUrl(venmo)}">@${escapeHtml(venmo)}</a>
-          </div>
-          <div class="host-actions">
-            <button class="yes" type="button" data-host-action="accepted" data-request-id="${entry.id}">Yes, add</button>
-            <button class="no" type="button" data-host-action="rejected" data-request-id="${entry.id}">No, pass</button>
-            <button class="warn" type="button" data-host-action="refund_needed" data-request-id="${entry.id}">Needs refund</button>
-            <a class="button secondary" href="${venmoPayUrl({
-              recipient: venmo,
-              amount,
-              memo: refundMemo,
-            })}">Open refund</a>
-            <button class="secondary" type="button" data-host-action="refunded" data-request-id="${entry.id}">Sent refund</button>
-            <button class="secondary" type="button" data-host-action="done" data-request-id="${entry.id}">Sang it</button>
-          </div>
-        </article>
-      `;
-    })
-    .join("");
+  const pendingEntries = state.queue.filter((entry) => entry.status === "pending_payment");
+  const acceptedEntries = state.queue.filter((entry) => entry.status === "accepted");
+  const refundEntries = state.queue.filter((entry) => entry.status === "refund_needed");
+
+  list.innerHTML = `
+    <section class="door-section">
+      <div class="section-head">
+        <div>
+          <h3>Requests Pending</h3>
+          <p>New singers waiting for a yes or no.</p>
+        </div>
+        <span class="status-pill">${pendingEntries.length}</span>
+      </div>
+      <div class="door-section-list">
+        ${
+          pendingEntries.length
+            ? pendingEntries.map(renderHostCard).join("")
+            : `<p class="empty-door">No requests pending right now.</p>`
+        }
+      </div>
+    </section>
+    <section class="door-section">
+      <div class="section-head">
+        <div>
+          <h3>Requests In Queue</h3>
+          <p>Approved singers ready to be called up.</p>
+        </div>
+        <span class="status-pill">${acceptedEntries.length}</span>
+      </div>
+      <div class="door-section-list">
+        ${
+          acceptedEntries.length
+            ? acceptedEntries.map(renderHostCard).join("")
+            : `<p class="empty-door">No singers in the queue yet.</p>`
+        }
+      </div>
+    </section>
+    <section class="door-section">
+      <div class="section-head">
+        <div>
+          <h3>Refunds</h3>
+          <p>Paid requests that need money sent back.</p>
+        </div>
+        <span class="status-pill">${refundEntries.length}</span>
+      </div>
+      <div class="door-section-list">
+        ${
+          refundEntries.length
+            ? refundEntries.map(renderHostCard).join("")
+            : `<p class="empty-door">No refunds waiting.</p>`
+        }
+      </div>
+    </section>
+  `;
 
   list.querySelectorAll("[data-host-action]").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -553,12 +636,51 @@ function renderHostQueue() {
       try {
         await hostUpdate(button.dataset.requestId, button.dataset.hostAction);
       } catch (error) {
+        if (dashboardStatus) dashboardStatus.textContent = error.message || "Host update failed.";
         if (status) status.textContent = error.message || "Host update failed.";
       } finally {
         button.disabled = false;
       }
     });
   });
+}
+
+function renderHostCard(entry) {
+  const song = getSong(getEntrySongId(entry));
+  const memo = entry.venmo_memo || entry.venmoMemo || "";
+  const venmo = entry.venmo_handle || entry.venmoHandle || "";
+  const amount = String(entry.payment_amount || entry.paymentAmount || REQUEST_AMOUNT);
+  const refundMemo = `Refund ${memo} - ${song ? song.title : "Scaries request"}`;
+
+  return `
+    <article class="host-card ${escapeHtml(entry.status)}">
+      <div class="host-topline">
+        <strong>${escapeHtml(entry.singer || "Unknown singer")}</strong>
+        <span class="status-pill">${escapeHtml(statusLabel(entry.status))}</span>
+      </div>
+      <div>
+        <span>${song ? escapeHtml(song.title) : "Unknown song"}</span>
+        <small>${song ? escapeHtml(song.artist) : escapeHtml(getEntrySongId(entry))}</small>
+      </div>
+      <div class="host-meta">
+        <code>${escapeHtml(memo)}</code>
+        <span>$${escapeHtml(amount)}</span>
+        <a href="${venmoWebUrl(venmo)}">@${escapeHtml(venmo)}</a>
+      </div>
+      <div class="host-actions">
+        <button class="yes" type="button" data-host-action="accepted" data-request-id="${entry.id}">Yes, add</button>
+        <button class="no" type="button" data-host-action="rejected" data-request-id="${entry.id}">No, pass</button>
+        <button class="warn" type="button" data-host-action="refund_needed" data-request-id="${entry.id}">Needs refund</button>
+        <a class="button secondary" href="${venmoPayUrl({
+          recipient: venmo,
+          amount,
+          memo: refundMemo,
+        })}">Open refund</a>
+        <button class="secondary" type="button" data-host-action="refunded" data-request-id="${entry.id}">Sent refund</button>
+        <button class="secondary" type="button" data-host-action="done" data-request-id="${entry.id}">Sang it</button>
+      </div>
+    </article>
+  `;
 }
 
 function statusLabel(status) {
