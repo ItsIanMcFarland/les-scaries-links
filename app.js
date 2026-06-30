@@ -268,6 +268,10 @@ function venmoPayUrl({ recipient = VENMO_HANDLE, amount = REQUEST_AMOUNT, memo }
   return `venmo://paycharge?${params.toString()}`;
 }
 
+function venmoAudienceWebUrl() {
+  return venmoWebUrl(VENMO_HANDLE);
+}
+
 function venmoWebUrl(recipient = VENMO_HANDLE) {
   return `https://account.venmo.com/u/${encodeURIComponent(recipient.replace(/^@/, ""))}`;
 }
@@ -289,7 +293,7 @@ async function hostUpdate(id, status) {
     return;
   }
 
-  const { error } = await state.supabase.rpc("host_update_request", {
+  const { data, error } = await state.supabase.rpc("host_update_request", {
     p_request_id: id,
     p_status: status,
     p_host_code: state.hostCode,
@@ -297,6 +301,7 @@ async function hostUpdate(id, status) {
 
   if (error) throw error;
   await loadHostQueue();
+  return data;
 }
 
 function initRequestForm() {
@@ -399,16 +404,32 @@ function initRequestForm() {
   });
 }
 
+document.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-copy-value]");
+  if (!button) return;
+
+  try {
+    await navigator.clipboard.writeText(button.dataset.copyValue);
+    button.textContent = "Copied";
+    setTimeout(() => {
+      button.textContent = button.dataset.copyLabel || "Copy";
+    }, 1200);
+  } catch {
+    button.textContent = "Copy failed";
+  }
+});
+
 function renderPaymentPanel(panel, request, song) {
   if (!panel) return;
   const memo = request.venmo_memo || request.venmoMemo;
   const amount = String(request.payment_amount || request.paymentAmount || REQUEST_AMOUNT);
   const payUrl = venmoPayUrl({ amount, memo });
+  const note = `Pay $${amount} to @${VENMO_HANDLE} and use memo ${memo}.`;
 
   panel.hidden = false;
   panel.innerHTML = `
     <h2>Venmo to finish</h2>
-    <p>Your request is pending until the host sees the Venmo payment.</p>
+    <p>Your request is pending until the host sees the Venmo payment. On a Mac, use the browser profile button and copy the memo.</p>
     <div class="payment-code">
       <span>Memo</span>
       <strong>${escapeHtml(memo)}</strong>
@@ -418,9 +439,11 @@ function renderPaymentPanel(panel, request, song) {
       <strong>$${escapeHtml(amount)}</strong>
     </div>
     <p>${escapeHtml(song.title)} - ${escapeHtml(song.artist)}</p>
+    <p>${escapeHtml(note)}</p>
     <div class="actions">
-      <a class="button" href="${payUrl}">Open Venmo</a>
-      <a class="button secondary" href="${venmoWebUrl()}">Venmo Profile</a>
+      <a class="button" href="${venmoAudienceWebUrl()}" target="_blank" rel="noreferrer">Open Venmo Profile</a>
+      <a class="button secondary" href="${payUrl}">Open Venmo App</a>
+      <button class="secondary" type="button" data-copy-value="${escapeHtml(memo)}" data-copy-label="Copy Memo">Copy Memo</button>
     </div>
   `;
 }
@@ -641,6 +664,9 @@ function renderHostQueue() {
       button.disabled = true;
       try {
         await hostUpdate(button.dataset.requestId, button.dataset.hostAction);
+        const message = hostActionMessage(button.dataset.hostAction);
+        if (dashboardStatus) dashboardStatus.textContent = message;
+        if (status) status.textContent = message;
       } catch (error) {
         if (dashboardStatus) dashboardStatus.textContent = error.message || "Host update failed.";
         if (status) status.textContent = error.message || "Host update failed.";
@@ -657,6 +683,7 @@ function renderHostCard(entry) {
   const venmo = entry.venmo_handle || entry.venmoHandle || "";
   const amount = String(entry.payment_amount || entry.paymentAmount || REQUEST_AMOUNT);
   const refundMemo = `Refund ${memo} - ${song ? song.title : "Scaries request"}`;
+  const actions = hostActions(entry, venmo, amount, refundMemo);
 
   return `
     <article class="host-card ${escapeHtml(entry.status)}">
@@ -674,19 +701,52 @@ function renderHostCard(entry) {
         <a href="${venmoWebUrl(venmo)}">@${escapeHtml(venmo)}</a>
       </div>
       <div class="host-actions">
-        <button class="yes" type="button" data-host-action="accepted" data-request-id="${entry.id}">Yes, add</button>
-        <button class="no" type="button" data-host-action="rejected" data-request-id="${entry.id}">No, pass</button>
-        <button class="warn" type="button" data-host-action="refund_needed" data-request-id="${entry.id}">Needs refund</button>
-        <a class="button secondary" href="${venmoPayUrl({
-          recipient: venmo,
-          amount,
-          memo: refundMemo,
-        })}">Open refund</a>
-        <button class="secondary" type="button" data-host-action="refunded" data-request-id="${entry.id}">Sent refund</button>
-        <button class="secondary" type="button" data-host-action="done" data-request-id="${entry.id}">Sang it</button>
+        ${actions}
       </div>
     </article>
   `;
+}
+
+function hostActions(entry, venmo, amount, refundMemo) {
+  if (entry.status === "pending_payment") {
+    return `
+      <button class="yes" type="button" data-host-action="accepted" data-request-id="${entry.id}">Yes, add</button>
+      <button class="no" type="button" data-host-action="rejected" data-request-id="${entry.id}">No, pass</button>
+      <button class="warn" type="button" data-host-action="refund_needed" data-request-id="${entry.id}">Needs refund</button>
+    `;
+  }
+
+  if (entry.status === "accepted") {
+    return `
+      <button class="secondary" type="button" data-host-action="done" data-request-id="${entry.id}">Sang it</button>
+      <button class="warn" type="button" data-host-action="refund_needed" data-request-id="${entry.id}">Needs refund</button>
+    `;
+  }
+
+  if (entry.status === "refund_needed") {
+    return `
+      <a class="button secondary" href="${venmoPayUrl({
+        recipient: venmo,
+        amount,
+        memo: refundMemo,
+      })}">Open refund app</a>
+      <a class="button secondary" href="${venmoWebUrl(venmo)}" target="_blank" rel="noreferrer">Open Venmo profile</a>
+      <button class="secondary" type="button" data-host-action="refunded" data-request-id="${entry.id}">Sent refund</button>
+    `;
+  }
+
+  return "";
+}
+
+function hostActionMessage(action) {
+  return {
+    accepted: "Added to Requests In Queue.",
+    rejected: "Request passed.",
+    refund_needed: "Moved to Refunds.",
+    refunded: "Refund marked sent.",
+    done: "Singer cleared from the queue.",
+    removed: "Request removed.",
+  }[action] || "Door updated.";
 }
 
 function statusLabel(status) {
