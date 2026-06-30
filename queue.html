@@ -70,8 +70,7 @@
 
       .panel-head {
         display: flex;
-        justify-content: space-between;
-        gap: 10px;
+        justify-content: flex-end;
       }
 
       .count {
@@ -150,7 +149,6 @@
       <h1>Active Queue</h1>
       <section class="panel">
         <div class="panel-head">
-          <p data-backend-status>Connecting...</p>
           <span class="count" data-queue-count>0 singers</span>
         </div>
         <p class="empty" data-empty-queue>No singers in the queue yet.</p>
@@ -158,8 +156,8 @@
       </section>
     </main>
 
-    <script src="supabase-config.js?v=venmo-amount-1"></script>
+    <script src="supabase-config.js?v=public-copy-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=venmo-amount-1"></script>
+    <script src="app.js?v=public-copy-1"></script>
   </body>
 </html>
