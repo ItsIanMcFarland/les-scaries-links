@@ -333,11 +333,18 @@ function makeMemo() {
   return `SCARIES-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 }
 
+function normalizePaymentAmount(value, minimum = REQUEST_AMOUNT) {
+  const parsedValue = Number.parseFloat(value);
+  const parsedMinimum = Number.parseFloat(minimum);
+  const amount = Number.isFinite(parsedValue) ? parsedValue : parsedMinimum;
+  return Math.max(amount, parsedMinimum).toFixed(2);
+}
+
 function venmoPayUrl({ recipient = VENMO_HANDLE, amount = REQUEST_AMOUNT, memo }) {
   const params = new URLSearchParams({
     txn: "pay",
     recipients: recipient.replace(/^@/, ""),
-    amount,
+    amount: normalizePaymentAmount(amount),
     note: memo,
   });
   return `venmo://paycharge?${params.toString()}`;
@@ -579,7 +586,8 @@ document.addEventListener("click", async (event) => {
 function renderPaymentPanel(panel, request, song) {
   if (!panel) return;
   const memo = request.venmo_memo || request.venmoMemo;
-  const amount = String(request.payment_amount || request.paymentAmount || REQUEST_AMOUNT);
+  const minimum = song.isWriteIn ? WRITE_IN_AMOUNT : REQUEST_AMOUNT;
+  const amount = normalizePaymentAmount(request.payment_amount || request.paymentAmount, minimum);
   const payUrl = venmoPayUrl({ amount, memo });
   const note = `Pay $${amount} to @${VENMO_HANDLE} and use memo ${memo}.`;
 
@@ -838,7 +846,8 @@ function renderHostCard(entry) {
   const song = getEntrySong(entry);
   const memo = entry.venmo_memo || entry.venmoMemo || "";
   const venmo = entry.venmo_handle || entry.venmoHandle || "";
-  const amount = String(entry.payment_amount || entry.paymentAmount || REQUEST_AMOUNT);
+  const minimum = song?.isWriteIn ? WRITE_IN_AMOUNT : REQUEST_AMOUNT;
+  const amount = normalizePaymentAmount(entry.payment_amount || entry.paymentAmount, minimum);
   const refundMemo = `Refund ${memo} - ${song ? song.title : "Scaries request"}`;
   const actions = hostActions(entry, venmo, amount, refundMemo);
 
