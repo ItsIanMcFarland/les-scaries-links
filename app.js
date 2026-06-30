@@ -474,7 +474,7 @@ function initHost() {
     event.preventDefault();
     state.hostCode = input.value.trim();
     localStorage.setItem(HOST_KEY, state.hostCode);
-    window.location.href = `${window.location.pathname}?door=open`;
+    window.location.assign(`${window.location.pathname}?door=open&v=${Date.now()}`);
   });
 
   refresh?.addEventListener("click", () => loadHostQueue());
