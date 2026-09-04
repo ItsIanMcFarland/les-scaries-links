@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scaries</title>
+    <meta
+      name="description"
+      content="Follow Scaries, join the email list, and read more about the live-band karaoke night."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #fff4df;
+        --muted: #d0bda3;
+        --line: rgba(255, 248, 234, 0.22);
+        --panel: rgba(8, 7, 7, 0.88);
+        --field: rgba(255, 248, 234, 0.075);
+        --red: #e11f2d;
+        --gold: #f4bd43;
+        --green: #36b889;
+        --black: #050404;
+        --checker: repeating-conic-gradient(#f5ead4 0 25%, #050404 0 50%) 0 0 / 18px 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 50% 20%, rgba(244, 189, 67, 0.22), transparent 18rem),
+          linear-gradient(90deg, rgba(225, 31, 45, 0.28), transparent 22%, transparent 78%, rgba(54, 184, 137, 0.16)),
+          linear-gradient(180deg, rgba(5, 4, 4, 0.36), rgba(5, 4, 4, 0.94)),
+          url("assets/scaries-club-stage.webp") center / cover fixed,
+          var(--black);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.62;
+        background-image:
+          linear-gradient(90deg, rgba(255, 244, 223, 0.045) 1px, transparent 1px),
+          repeating-linear-gradient(0deg, rgba(255, 244, 223, 0.05) 0 1px, transparent 1px 7px),
+          linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.72));
+        background-size: 72px 72px, 100% 9px, 100% 100%;
+        mix-blend-mode: screen;
+      }
+
+      main {
+        position: relative;
+        z-index: 1;
+        width: min(100%, 640px);
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: clamp(28px, 6vw, 56px) 18px 36px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 18px;
+      }
+
+      header {
+        display: grid;
+        gap: 10px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(58px, 16vw, 96px);
+        line-height: 0.82;
+        letter-spacing: 0;
+        text-shadow:
+          0 3px 0 #000,
+          2px 5px 0 rgba(225, 31, 45, 0.46),
+          0 16px 34px rgba(0, 0, 0, 0.72);
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .signup,
+      .link {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background:
+          linear-gradient(90deg, rgba(225, 31, 45, 0.16), transparent 12px),
+          linear-gradient(180deg, rgba(255, 244, 223, 0.045), rgba(0, 0, 0, 0.22)),
+          var(--panel);
+        box-shadow:
+          0 18px 44px rgba(0, 0, 0, 0.48),
+          inset 0 1px 0 rgba(255, 244, 223, 0.08);
+        backdrop-filter: blur(18px);
+      }
+
+      .signup::before,
+      .link::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 5px;
+        width: 3px;
+        background: var(--red);
+      }
+
+      .signup::after,
+      .link::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 5px;
+        background: var(--checker);
+        opacity: 0.76;
+        pointer-events: none;
+      }
+
+      .links,
+      .signup,
+      form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .signup {
+        padding: 16px;
+      }
+
+      .link {
+        min-height: 78px;
+        display: grid;
+        grid-template-columns: 52px 1fr auto;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        color: var(--ink);
+        text-decoration: none;
+      }
+
+      .icon {
+        width: 52px;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(0, 0, 0, 0.75);
+        border-radius: 2px;
+        color: #080606;
+        box-shadow:
+          3px 3px 0 #000,
+          inset 0 0 0 1px rgba(255, 248, 234, 0.18);
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .green {
+        background: var(--green);
+      }
+
+      .gold {
+        background: var(--gold);
+      }
+
+      .title,
+      label {
+        color: var(--ink);
+        font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+        font-weight: 900;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .title {
+        font-size: 19px;
+      }
+
+      .description {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 14px;
+      }
+
+      input {
+        width: 100%;
+        min-height: 48px;
+        border: 1px solid rgba(255, 248, 234, 0.28);
+        border-radius: 4px;
+        padding: 12px 13px;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(255, 248, 234, 0.06), rgba(0, 0, 0, 0.18)),
+          var(--field);
+        font: inherit;
+      }
+
+      button {
+        min-height: 48px;
+        border: 1px solid rgba(255, 248, 234, 0.22);
+        border-radius: 3px;
+        color: #080606;
+        background: var(--gold);
+        box-shadow: 4px 4px 0 #000;
+        font: inherit;
+        font-weight: 900;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .status {
+        min-height: 19px;
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .arrow {
+        color: var(--muted);
+        font-size: 24px;
+      }
+
+      footer {
+        color: rgba(255, 244, 223, 0.7);
+        font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 520px) {
+        main {
+          justify-content: start;
+        }
+
+        .link {
+          grid-template-columns: 46px 1fr;
+        }
+
+        .icon {
+          width: 46px;
+          font-size: 16px;
+        }
+
+        .arrow {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Scaries</h1>
+        <p>Live-band karaoke. Loud room. Your friends made you do it.</p>
+      </header>
+
+      <section class="links" aria-label="Scaries links">
+        <a class="link" href="https://www.instagram.com/sundayscarysingalongs">
+          <span class="icon green" aria-hidden="true">IG</span>
+          <span>
+            <span class="title">Instagram</span>
+            <span class="description">Photos, videos, and event updates.</span>
+          </span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </section>
+
+      <section class="signup" aria-labelledby="email-title">
+        <div>
+          <div class="title" id="email-title">Email List</div>
+          <p>Get the next date and ticket drop.</p>
+        </div>
+        <form data-email-form>
+          <label>
+            Email
+            <input data-email-input type="email" autocomplete="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Name
+            <input data-name-input autocomplete="name" placeholder="Optional" />
+          </label>
+          <button type="submit">Join the List</button>
+          <p class="status" data-email-status aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="links" aria-label="Scaries links">
+        <a class="link" href="about.html">
+          <span class="icon gold" aria-hidden="true">BIO</span>
+          <span>
+            <span class="title">About</span>
+            <span class="description">The band, the night, and the backyard origin story.</span>
+          </span>
+          <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </section>
+
+      <footer>@sundayscarysingalongs</footer>
+    </main>
+
+    <script src="supabase-config.js?v=email-list-1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const form = document.querySelector("[data-email-form]");
+      const emailInput = document.querySelector("[data-email-input]");
+      const nameInput = document.querySelector("[data-name-input]");
+      const status = document.querySelector("[data-email-status]");
+
+      function setStatus(message) {
+        status.textContent = message;
+      }
+
+      function getSupabaseClient() {
+        const config = window.SCARIES_SUPABASE;
+        if (!config?.url || !config?.anonKey || !window.supabase?.createClient) return null;
+        return window.supabase.createClient(config.url, config.anonKey);
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const email = emailInput.value.trim().toLowerCase();
+        const name = nameInput.value.trim();
+        const client = getSupabaseClient();
+
+        if (!client) {
+          setStatus("Email signup is not connected yet.");
+          return;
+        }
+
+        setStatus("Adding you...");
+        const { error } = await client.rpc("join_email_list", {
+          p_email: email,
+          p_name: name,
+          p_source: "more",
+        });
+
+        if (error) {
+          console.error(error);
+          setStatus("Could not add that email yet. Try again at the merch table.");
+          return;
+        }
+
+        form.reset();
+        setStatus("You're on the list.");
+      });
+    </script>
+  </body>
+</html>
